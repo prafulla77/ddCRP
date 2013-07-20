@@ -1,2 +1,8 @@
 #Ignore the Data/ directory
 Data/
+#Ignore the Scripts/data_formatting
+Scripts/data_formatting
+#Ignore the .DS_Stotr
+*.DS_Store
+
+
