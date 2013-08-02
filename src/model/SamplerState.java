@@ -1,4 +1,9 @@
 package model;
+
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * This class is for storing the state of the sampler for an iteration.
  * An object of this class represent the state of the sampler at one iteration.
@@ -14,12 +19,12 @@ public class SamplerState {
 	/**
 	 * This stores the customer link for each data point.
 	 */
-	private Long[] c;
+	private ArrayList<Long> c;
 	
 	/**
 	 * This stores the table assignment for each data point.
 	 */
-	private Long[] t;
+	private ArrayList<Long> t;
 	
 	/**
 	 * The number of occupied tables at this iteration
@@ -33,21 +38,23 @@ public class SamplerState {
 	/**
 	 * This stores the topic assignments for each data point (which is basically the topic assignment at the given table they are sitting at)
 	 */
-	private Long[] k_c;
+	private ArrayList<Long> k_c;
 	
 	/**
 	 * This stores the topic assignments for each table;
 	 */
-	private Long[] k_t;
+	private ArrayList<Long> k_t;
 	
 	/**
 	 * This stores the number of tables(clusters) assigned to each topic.
 	 */
-	private Long[] m;
-
+	private HashMap<Long,Long> m;
 	/**
+	 * 
 	 * Getters and Setters
+	 * 
 	 */
+	
 	public static Long getNum_data() {
 		return num_data;
 	}
@@ -56,26 +63,25 @@ public class SamplerState {
 		SamplerState.num_data = num_data;
 	}
 
-	public Long[] getC() {
+	public ArrayList<Long> getC() {
 		return c;
 	}
 
-	public void setC(Long[] c) {
+	public void setC(ArrayList<Long> c) {
 		this.c = c;
 	}
 	/**
-	 * Method to return the table assignment of each observation
+	 * get the table assignments for each data point
 	 * @return
 	 */
-	public Long[] get_t() {
+	public ArrayList<Long> get_t() {
 		return t;
 	}
-
 	/**
-	 * To set the table assignment of each observation
-	 * @param t
+	 * set the table assignments for each data point
+	 * @return
 	 */
-	public void set_t(Long[] t) {
+	public void set_t(ArrayList<Long> t) {
 		this.t = t;
 	}
 
@@ -95,30 +101,39 @@ public class SamplerState {
 		K = k;
 	}
 
-	public Long[] getK_c() {
+	public ArrayList<Long> getK_c() {
 		return k_c;
 	}
 
-	public void setK_c(Long[] k_c) {
+	public void setK_c(ArrayList<Long> k_c) {
 		this.k_c = k_c;
 	}
 
-	public Long[] getK_t() {
+	public ArrayList<Long> getK_t() {
 		return k_t;
 	}
 
-	public void setK_t(Long[] k_t) {
+	public void setK_t(ArrayList<Long> k_t) {
 		this.k_t = k_t;
 	}
 
-	public Long[] getM() {
+	public HashMap<Long,Long> getM() {
 		return m;
 	}
 
-	public void setM(Long[] m) {
+	public void setM(HashMap<Long,Long> m) {
 		this.m = m;
 	}
-		
-	
 
+	/**
+	 * Prints the object state
+	 */
+	public void prettyPrint(PrintStream out)
+	{
+		out.println("Total number of observations are "+SamplerState.num_data);
+		out.println("Total number of tables are "+T);
+		out.println("Total number of topics "+K);
+	}
+	
+	
 }
