@@ -20,8 +20,8 @@ public class Driver {
 		for(int i=0;i<list_observations.size();i++)
 			num_data = num_data + list_observations.get(i).size();
 		
-		SamplerStateTracker.initializeSamplerState(num_data);
-		SamplerStateTracker.samplerStates.get(0).prettyPrint(new PrintStream("output.txt"));
+		SamplerStateTracker.initializeSamplerState(list_observations);
+		SamplerStateTracker.samplerStates.get(0).prettyPrint(System.out);
 	}
 
 }

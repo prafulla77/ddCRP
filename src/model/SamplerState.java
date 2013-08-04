@@ -17,14 +17,14 @@ public class SamplerState {
 	private static Long num_data;
 	
 	/**
-	 * This stores the customer link for each data point.
+	 * This stores the customer link for each data point. Each list represents a city/document etc.
 	 */
-	private ArrayList<Long> c;
+	private ArrayList<ArrayList<Long>> c;
 	
 	/**
-	 * This stores the table assignment for each data point.
+	 * This stores the table assignment for each data point.Each list represents a city/document etc.
 	 */
-	private ArrayList<Long> t;
+	private ArrayList<ArrayList<Long>> t;
 	
 	/**
 	 * The number of occupied tables at this iteration
@@ -38,12 +38,12 @@ public class SamplerState {
 	/**
 	 * This stores the topic assignments for each data point (which is basically the topic assignment at the given table they are sitting at)
 	 */
-	private ArrayList<Long> k_c;
+	private ArrayList<ArrayList<Long>> k_c;
 	
 	/**
 	 * This stores the topic assignments for each table;
 	 */
-	private ArrayList<Long> k_t;
+	private ArrayList<ArrayList<Long>> k_t;
 	
 	/**
 	 * This stores the number of tables(clusters) assigned to each topic.
@@ -63,27 +63,6 @@ public class SamplerState {
 		SamplerState.num_data = num_data;
 	}
 
-	public ArrayList<Long> getC() {
-		return c;
-	}
-
-	public void setC(ArrayList<Long> c) {
-		this.c = c;
-	}
-	/**
-	 * get the table assignments for each data point
-	 * @return
-	 */
-	public ArrayList<Long> get_t() {
-		return t;
-	}
-	/**
-	 * set the table assignments for each data point
-	 * @return
-	 */
-	public void set_t(ArrayList<Long> t) {
-		this.t = t;
-	}
 
 	public Long getT() {
 		return T;
@@ -101,29 +80,46 @@ public class SamplerState {
 		K = k;
 	}
 
-	public ArrayList<Long> getK_c() {
-		return k_c;
-	}
-
-	public void setK_c(ArrayList<Long> k_c) {
-		this.k_c = k_c;
-	}
-
-	public ArrayList<Long> getK_t() {
-		return k_t;
-	}
-
-	public void setK_t(ArrayList<Long> k_t) {
-		this.k_t = k_t;
-	}
-
 	public HashMap<Long,Long> getM() {
 		return m;
 	}
-
+	
 	public void setM(HashMap<Long,Long> m) {
 		this.m = m;
 	}
+
+	public ArrayList<ArrayList<Long>> getC() {
+		return c;
+	}
+
+	public void setC(ArrayList<ArrayList<Long>> c) {
+		this.c = c;
+	}
+
+	public ArrayList<ArrayList<Long>> getK_c() {
+		return k_c;
+	}
+
+	public void setK_c(ArrayList<ArrayList<Long>> k_c) {
+		this.k_c = k_c;
+	}
+
+	public ArrayList<ArrayList<Long>> getK_t() {
+		return k_t;
+	}
+
+	public void setK_t(ArrayList<ArrayList<Long>> k_t) {
+		this.k_t = k_t;
+	}
+
+	public ArrayList<ArrayList<Long>> get_t()
+	{
+		return t;
+	}
+	public void set_t(ArrayList<ArrayList<Long>> t) {
+		this.t = t;
+	}
+
 
 	/**
 	 * Prints the object state
