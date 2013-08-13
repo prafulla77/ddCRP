@@ -13,7 +13,7 @@ import java.util.Random;
 public class SamplerStateTracker {
 	
 	/**
-	 * The current iteration number
+	 * The current iteration number. The first iteration is zeroth iteration.
 	 */
 	public static int current_iter;
 	
@@ -23,10 +23,21 @@ public class SamplerStateTracker {
 	public static int max_iter;
 	
 	/**
-	 * List to hold the sampler states for each iteration
+	 * List to hold the sampler states for each iteration. 
 	 */
 	public static ArrayList<SamplerState> samplerStates = new ArrayList<SamplerState>();
 	
+	/**
+	 * Returns the current sampler state.
+	 * @return
+	 */
+	public static SamplerState returnCurrentSamplerState()
+	{
+		if(current_iter >= 0 && current_iter==samplerStates.size()-1)
+			return samplerStates.get(current_iter);
+		else
+			return null;
+	}
 	
 	/**
 	 * This initializes the sampler state. All observations point to themselves ie they have the customer assignments as themselves.
@@ -48,6 +59,7 @@ public class SamplerStateTracker {
 			ArrayList<ArrayList<Long>> table_assignments = new ArrayList<ArrayList<Long>>();
 			ArrayList<ArrayList<Long>> topic_assignments_table = new ArrayList<ArrayList<Long>>();
 			ArrayList<ArrayList<Long>> topic_assignments_customer = new ArrayList<ArrayList<Long>>();
+			ArrayList<HashMap<Long,StringBuffer>> list_customers_in_table = new  ArrayList<HashMap<Long,StringBuffer>>();
 			HashMap<Long,Long> count_each_topic = new HashMap<Long,Long>();
 			int num_topics = 100; //setting the initial number of topics to 100
 			Random gen = new Random();			
@@ -57,10 +69,12 @@ public class SamplerStateTracker {
 				ArrayList<Long> table_assignment_per_list = new ArrayList<Long>();
 				ArrayList<Long> topic_assignments_table_per_list = new ArrayList<Long>();
 				ArrayList<Long> topic_assignments_customer_per_list = new ArrayList<Long>();
+				HashMap<Long,StringBuffer> customers_in_table_per_list = new HashMap<Long,StringBuffer>(); 
 				for(long j=0;j<list_observations.get(i).size();j++) //note: the customers are indexed from 0
 				{//initializing the customer assignments for each point to itself and hence each customer in its own table
 					customer_assignment_per_list.add(j); 
 					table_assignment_per_list.add(j);
+					customers_in_table_per_list.put(j, new StringBuffer(Long.toString(j)));
 					int topic = gen.nextInt(num_topics);
 					topic_assignments_table_per_list.add(new Long(topic));
 					topic_assignments_customer_per_list.add(new Long(topic));
@@ -73,11 +87,13 @@ public class SamplerStateTracker {
 				
 				customer_assignments.add(customer_assignment_per_list);
 				table_assignments.add(table_assignment_per_list);
+				list_customers_in_table.add(customers_in_table_per_list);
 				topic_assignments_table.add(topic_assignments_table_per_list);
 				topic_assignments_customer.add(topic_assignments_customer_per_list);
 			}
 			state0.setC(customer_assignments);
 			state0.set_t(table_assignments);
+			state0.setCustomers_in_table(list_customers_in_table);
 			state0.setK_c(topic_assignments_customer);
 			state0.setK_t(topic_assignments_table);
 			state0.setT(num_data); //number of tables equal to num_data
@@ -85,7 +101,7 @@ public class SamplerStateTracker {
 			state0.setM(count_each_topic);
 			
 			//Now putting into the arraylist of sampler states
-			current_iter = 1;
+			current_iter = 0;
 			samplerStates.add(state0);
 		}
 	}

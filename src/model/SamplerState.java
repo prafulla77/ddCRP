@@ -49,6 +49,13 @@ public class SamplerState {
 	 * This stores the number of tables(clusters) assigned to each topic.
 	 */
 	private HashMap<Long,Long> m;
+	
+	/**
+	 * Map of table and the customer_ids.
+	 * To Discuss: Need to find a better way of storing customer ids, presently concatenating strings of ids, not very efficient 
+	 */
+	private ArrayList<HashMap<Long,StringBuffer>> customers_in_table;
+
 	/**
 	 * 
 	 * Getters and Setters
@@ -91,9 +98,31 @@ public class SamplerState {
 	public ArrayList<ArrayList<Long>> getC() {
 		return c;
 	}
+	
+	/**
+	 * Returns the customer link of a particular customer given the list and the customer indexes
+	 * @param customer_index
+	 * @param city_index
+	 * @return
+	 */
+	public Long getC(int customer_index,int city_index)
+	{
+		return c.get(city_index).get(customer_index);
+	}
 
 	public void setC(ArrayList<ArrayList<Long>> c) {
 		this.c = c;
+	}
+	
+	/**
+	 * Sets the new customer assignment for a customer
+	 * @param cust_assignment
+	 * @param customer_index
+	 * @param city_index
+	 */
+	public void setC(Long cust_assignment, int customer_index,int city_index)
+	{
+		c.get(city_index).set(customer_index, cust_assignment);
 	}
 
 	public ArrayList<ArrayList<Long>> getK_c() {
@@ -116,10 +145,79 @@ public class SamplerState {
 	{
 		return t;
 	}
+	
+	/**
+	 * Returns the table assignment for a specific customer given the list and the customer index
+	 * @param customer_index
+	 * @param city_index
+	 * @return
+	 */
+	public Long get_t(int customer_index,int city_index)
+	{
+		return t.get(city_index).get(customer_index);
+	}
 	public void set_t(ArrayList<ArrayList<Long>> t) {
 		this.t = t;
 	}
+	/**
+	 * Sets the new table assignment for a customer
+	 * @param table_assignment
+	 * @param customer_index
+	 * @param city_index
+	 */
+	public void set_t(Long table_assignment, int customer_index,int city_index)
+	{
+		t.get(city_index).set(customer_index, table_assignment);
+	}
+	public ArrayList<HashMap<Long, StringBuffer>> getCustomers_in_table() {
+		return customers_in_table;
+	}
+	/**
+	 * returns the string of customers sitting at a table in a given list
+	 * @param table_id
+	 * @param list_index
+	 * @return
+	 */
+	public String getCustomers_in_table(int table_id,int list_index)
+	{		
+		return customers_in_table.get(list_index).get(new Long(table_id)).toString();
+	}
 
+	public void setCustomers_in_table(
+			ArrayList<HashMap<Long, StringBuffer>> customers_in_table) {
+		this.customers_in_table = customers_in_table;
+	}
+	
+
+	/**
+	 * Returns a new sampler state which is identical to the given sampler state.
+	 * @return
+	 */
+	public SamplerState copy()
+	{
+		SamplerState s = new SamplerState();
+		ArrayList<ArrayList<Long>> new_c = new ArrayList<ArrayList<Long>>(); //customer assignments
+		ArrayList<ArrayList<Long>> new_t = new ArrayList<ArrayList<Long>>(); //table assignments per customer
+		ArrayList<HashMap<Long,StringBuffer>> new_customers_in_table = new ArrayList<HashMap<Long,StringBuffer>>();  
+		//ArrayList<ArrayList<Long>> new_k_c = new ArrayList<ArrayList<Long>>(); //topic assignments per customer
+		for(int i=0;i<c.size();i++)
+		{
+			ArrayList<Long> customer_assignments_copy = new ArrayList<Long>(c.get(i)); //this will create a new list pointing to the same long objects, but its ok since Long is immutable.
+			new_c.add(customer_assignments_copy);
+			ArrayList<Long> table_assignments_copy = new ArrayList<Long>(t.get(i));
+			new_t.add(table_assignments_copy);
+			HashMap<Long,StringBuffer> customers_in_table_copy = new HashMap<Long,StringBuffer>(customers_in_table.get(i));
+			new_customers_in_table.add(customers_in_table_copy);
+			//ArrayList<Long> topic_assignments_copy = new ArrayList<Long>(k_c.get(i));
+			//new_k_c.add(topic_assignments_copy);
+		}
+		s.c = new_c;
+		s.t = new_t;
+		s.T = new Long(T);
+		s.customers_in_table = new_customers_in_table;
+		//s.K = new Long(K);
+		return s;
+	}
 
 	/**
 	 * Prints the object state
