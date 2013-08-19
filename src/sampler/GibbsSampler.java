@@ -11,10 +11,11 @@ import model.SamplerStateTracker;
 
 import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.AsUndirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
-import org.la4j.matrix.sparse.CRSMatrix;
-import org.la4j.vector.Vector;
+import org.jgrapht.traverse.DepthFirstIterator;
 
 import data.Data;
 
@@ -99,8 +100,52 @@ public class GibbsSampler {
 		
 		//If the 'obs_to_sample' is a part of a cycle then removing its customer assignment cannot split the table. 
 		//Check if there is a cycle containing obs_to_sample
-		CycleDetector<Long,DefaultEdge> cycleDetector = new CycleDetector<>(g);
-		System.out.println(cycleDetector.detectCyclesContainingVertex(map_of_references.get(new Long(index)))); 
+		CycleDetector<Long,DefaultEdge> cycleDetector = new CycleDetector<Long,DefaultEdge>(g);
+		//System.out.println(cycleDetector.detectCyclesContainingVertex(map_of_references.get(new Long(index))));
+		boolean isCyclePresent = cycleDetector.detectCyclesContainingVertex(map_of_references.get(new Long(index)));
+		if(!isCyclePresent) //on removing the link, the table will be split 
+		{
+			//Now collecting the table members of the observation we are sampling for
+			//I will first create a undirected graph, without the outgoing edge from the observation, Then I will do a 
+			//depth first traversal starting from the observation to be sampled and get all the other nodes of the components reachable from it
+			UndirectedGraph<Long,DefaultEdge> u_g =
+					new AsUndirectedGraph<Long, DefaultEdge>(g); //creating the undirected graph from the directed graph
+			//now removing the edge (obs_to_sample -> its customer assignment)
+			u_g.removeEdge(map_of_references.get(new Long(index)), map_of_references.get(s.getC(index, list_index)));
+			
+			//Lets do a depth first traversal now and get all the table members
+			DepthFirstIterator<Long,DefaultEdge> iter = new DepthFirstIterator<Long,DefaultEdge>(u_g,map_of_references.get(new Long(index)));
+			ArrayList<Long> new_table_members = new ArrayList<Long>();
+			 while(iter.hasNext())			 
+				 new_table_members.add(iter.next());		
+			 
+			 //Let's get the customers which remained in the original table after the split, do a depth first traversal starting from the original customer assignment of the observation to be sampled
+			 iter = new DepthFirstIterator<Long,DefaultEdge>(u_g,map_of_references.get(s.getC(index, list_index)));
+			 ArrayList<Long> old_table_members = new ArrayList<Long>();
+			 while(iter.hasNext())
+				 old_table_members.add(iter.next());
+			 
+			 //Ok, now since the table has split, update the sampler state accordingly
+			 s.setT(s.getT()+1); //incrementing the number of tables
+			 s.setC(null, index, list_index); //since the observation has 'no' customer assignment as of now
+			 for(Long l:new_table_members) //setting the table assignment to the new table number			 
+				 s.set_t(s.getT()-1, l.intValue(), list_index);// It's s.getT()-1 since, the table assignment starts from 0.
+			Long old_table_id = table_id;
+			StringBuffer sb = new StringBuffer();
+			for(int i=0;i<old_table_members.size()-1;i++)			
+				sb.append(old_table_members.get(i)).append(",");
+			sb.append(old_table_members.get(old_table_members.size()-1));
+			s.setCustomers_in_table(sb, old_table_id.intValue(), list_index);
+			
+			Long new_table_id = s.getT()-1;
+			sb = new StringBuffer();
+			for(int i=0;i<new_table_members.size()-1;i++)			
+				sb.append(new_table_members.get(i)).append(",");
+			sb.append(new_table_members.get(new_table_members.size()-1));
+			s.setCustomers_in_table(sb, new_table_id.intValue(), list_index);
+		}
+		//Now, will sample a new link for the customer
+		
 	}
 
 }

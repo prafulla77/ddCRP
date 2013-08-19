@@ -182,6 +182,16 @@ public class SamplerState {
 	{		
 		return customers_in_table.get(list_index).get(new Long(table_id)).toString();
 	}
+	/**
+	 * Sets the customers sitting at a table, given the indexes and the table number
+	 * @param s
+	 * @param table_id
+	 * @param list_index
+	 */
+	public void setCustomers_in_table(StringBuffer s,int table_id,int list_index)
+	{
+		customers_in_table.get(list_index).put(new Long(table_id), s);
+	}
 
 	public void setCustomers_in_table(
 			ArrayList<HashMap<Long, StringBuffer>> customers_in_table) {
