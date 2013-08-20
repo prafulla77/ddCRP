@@ -168,6 +168,9 @@ public class GibbsSampler {
 				}
 				else //will have to compute the change in likelihood
 				{					
+					//get the proposed table members
+					String s_table_proposed_members = s.getCustomers_in_table(table_proposed.intValue(), list_index);
+					String[] table_proposed_members = s_table_proposed_members.split(",");
 					
 				}
 			}
