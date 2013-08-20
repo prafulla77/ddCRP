@@ -16,6 +16,8 @@ import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.AsUndirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
+import org.la4j.matrix.sparse.CRSMatrix;
+import org.la4j.vector.Vector;
 
 import data.Data;
 
@@ -47,15 +49,11 @@ public class GibbsSampler {
 //				sampleLink(list,j,i); //sending the list (city) and the index so that the observation can be accessed
 //			}		
 //		}	
-		sampleLink(all_observations.get(10), 10, 10);
+		sampleLink(all_observations.get(10), 0, 0);
 	}
 	
 	private static void sampleLink(ArrayList<Double>list, int index, int list_index)
 	{
-		//get the distance matrix for Prior computation
-		//ArrayList<CRSMatrix> distanceMatrices = Data.getDistanceMatrices();
-		//CRSMatrix distance_matrix = distanceMatrices.get(list_index); // getting the correct distance matrix 		
-		
 		//check to see if the table has circle or not
 		Double obs_to_sample = list.get(index); //observation whose link has to be sampled
 		
@@ -138,6 +136,7 @@ public class GibbsSampler {
 			s.setCustomers_in_table(sb, old_table_id.intValue(), list_index);
 			
 			Long new_table_id = s.getT()-1;
+			table_id = new_table_id; //since this is the new table_id of the current customer we are trying to sample for.
 			sb = new StringBuffer();
 			for(int i=0;i<new_table_members.size()-1;i++)			
 				sb.append(new_table_members.get(i)).append(",");
@@ -145,6 +144,35 @@ public class GibbsSampler {
 			s.setCustomers_in_table(sb, new_table_id.intValue(), list_index);
 		}
 		//Now, will sample a new link for the customer
+		//get the distance matrix for Prior computation
+		ArrayList<CRSMatrix> distanceMatrices = Data.getDistanceMatrices();
+		CRSMatrix distance_matrix = distanceMatrices.get(list_index); // getting the correct distance matrix 
+		Vector priors = distance_matrix.getRow(index);		
+		priors = priors.normalize();		
+		//Now for each possible 'new' customer assignment, ie for those whose priors != 0
+		//we calculate the posterior probability of forming the link with that customer.
+		//For that we calculate the change in likelihood if there are joins of tables
+		
+		ArrayList<Double> logPosterior = new ArrayList<Double>(); //this will hold the posterior probabilities for all possible customer assignment and we will sample according to these probabilities
+		ArrayList<Integer> indexes = new ArrayList<Integer>(); // for storing the indexes of the customers who could be possible assignments
+		for(int i=0;i<priors.length();i++)
+		{
+			if(priors.get(i)!=0)
+			{
+				indexes.add(i); //adding the index of this possible customer assignment.
+				//get the table id of this table				
+				Long table_proposed = s.get_t(i, list_index); //table_proposed is the proposed table to be joined
+				if(table_proposed.equals(table_id)) //since the proposed table is the same, hence there will be no change in the likelihood if this is the customer assignment
+				{
+					logPosterior.add(Math.log10(priors.get(i))); //since the posterior will be determined only by the prior probability
+				}
+				else //will have to compute the change in likelihood
+				{					
+					
+				}
+			}
+		}
+		
 		
 	}
 
