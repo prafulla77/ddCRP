@@ -19,12 +19,12 @@ public class SamplerState {
 	/**
 	 * This stores the customer link for each data point. Each list represents a city/document etc.
 	 */
-	private ArrayList<ArrayList<Long>> c;
+	private ArrayList<ArrayList<Integer>> c;
 	
 	/**
 	 * This stores the table assignment for each data point.Each list represents a city/document etc.
 	 */
-	private ArrayList<ArrayList<Long>> t;
+	private ArrayList<ArrayList<Integer>> t;
 	
 	/**
 	 * The number of occupied tables at this iteration
@@ -54,7 +54,7 @@ public class SamplerState {
 	 * Map of table and the customer_ids.
 	 * To Discuss: Need to find a better way of storing customer ids, presently concatenating strings of ids, not very efficient 
 	 */
-	private ArrayList<HashMap<Long,StringBuffer>> customers_in_table;
+	private ArrayList<HashMap<Integer,StringBuffer>> customers_in_table;
 
 	/**
 	 * 
@@ -95,7 +95,7 @@ public class SamplerState {
 		this.m = m;
 	}
 
-	public ArrayList<ArrayList<Long>> getC() {
+	public ArrayList<ArrayList<Integer>> getC() {
 		return c;
 	}
 	
@@ -105,12 +105,12 @@ public class SamplerState {
 	 * @param city_index
 	 * @return
 	 */
-	public Long getC(int customer_index,int city_index)
+	public int getC(int customer_index,int city_index)
 	{
 		return c.get(city_index).get(customer_index);
 	}
 
-	public void setC(ArrayList<ArrayList<Long>> c) {
+	public void setC(ArrayList<ArrayList<Integer>> c) {
 		this.c = c;
 	}
 	
@@ -120,7 +120,7 @@ public class SamplerState {
 	 * @param customer_index
 	 * @param city_index
 	 */
-	public void setC(Long cust_assignment, int customer_index,int city_index)
+	public void setC(Integer cust_assignment, int customer_index,int city_index)
 	{
 		c.get(city_index).set(customer_index, cust_assignment);
 	}
@@ -141,7 +141,7 @@ public class SamplerState {
 		this.k_t = k_t;
 	}
 
-	public ArrayList<ArrayList<Long>> get_t()
+	public ArrayList<ArrayList<Integer>> get_t()
 	{
 		return t;
 	}
@@ -152,11 +152,11 @@ public class SamplerState {
 	 * @param city_index
 	 * @return
 	 */
-	public Long get_t(int customer_index,int city_index)
+	public int get_t(int customer_index,int city_index)
 	{
 		return t.get(city_index).get(customer_index);
 	}
-	public void set_t(ArrayList<ArrayList<Long>> t) {
+	public void set_t(ArrayList<ArrayList<Integer>> t) {
 		this.t = t;
 	}
 	/**
@@ -165,11 +165,11 @@ public class SamplerState {
 	 * @param customer_index
 	 * @param city_index
 	 */
-	public void set_t(Long table_assignment, int customer_index,int city_index)
+	public void set_t(Integer table_assignment, int customer_index,int city_index)
 	{
 		t.get(city_index).set(customer_index, table_assignment);
 	}
-	public ArrayList<HashMap<Long, StringBuffer>> getCustomers_in_table() {
+	public ArrayList<HashMap<Integer, StringBuffer>> getCustomers_in_table() {
 		return customers_in_table;
 	}
 	/**
@@ -181,7 +181,7 @@ public class SamplerState {
 	public String getCustomers_in_table(int table_id,int list_index)
 	{		
 		//System.out.println(customers_in_table.get(list_index).get(new Long(table_id)));
-		return customers_in_table.get(list_index).get(new Long(table_id)).toString();
+		return customers_in_table.get(list_index).get(table_id).toString();
 	}
 	/**
 	 * Sets the customers sitting at a table, given the indexes and the table number
@@ -191,11 +191,11 @@ public class SamplerState {
 	 */
 	public void setCustomers_in_table(StringBuffer s,int table_id,int list_index)
 	{
-		customers_in_table.get(list_index).put(new Long(table_id), s);
+		customers_in_table.get(list_index).put(table_id, s);
 	}
 
 	public void setCustomers_in_table(
-			ArrayList<HashMap<Long, StringBuffer>> customers_in_table) {
+			ArrayList<HashMap<Integer, StringBuffer>> customers_in_table) {
 		this.customers_in_table = customers_in_table;
 	}
 	
@@ -207,15 +207,15 @@ public class SamplerState {
 	public SamplerState copy()
 	{
 		SamplerState s = new SamplerState();
-		ArrayList<ArrayList<Long>> new_c = new ArrayList<ArrayList<Long>>(); //customer assignments
-		ArrayList<ArrayList<Long>> new_t = new ArrayList<ArrayList<Long>>(); //table assignments per customer
-		ArrayList<HashMap<Long,StringBuffer>> new_customers_in_table = new ArrayList<HashMap<Long,StringBuffer>>();  
+		ArrayList<ArrayList<Integer>> new_c = new ArrayList<ArrayList<Integer>>(); //customer assignments
+		ArrayList<ArrayList<Integer>> new_t = new ArrayList<ArrayList<Integer>>(); //table assignments per customer
+		ArrayList<HashMap<Integer,StringBuffer>> new_customers_in_table = new ArrayList<HashMap<Integer,StringBuffer>>();  
 		//ArrayList<ArrayList<Long>> new_k_c = new ArrayList<ArrayList<Long>>(); //topic assignments per customer
 		for(int i=0;i<c.size();i++)
 		{
-			ArrayList<Long> customer_assignments_copy = new ArrayList<Long>(c.get(i)); //this will create a new list pointing to the same long objects, but its ok since Long is immutable.
+			ArrayList<Integer> customer_assignments_copy = new ArrayList<Integer>(c.get(i)); //this will create a new list pointing to the same long objects, but its ok since Long is immutable.
 			new_c.add(customer_assignments_copy);
-			ArrayList<Long> table_assignments_copy = new ArrayList<Long>(t.get(i));
+			ArrayList<Integer> table_assignments_copy = new ArrayList<Integer>(t.get(i));
 			new_t.add(table_assignments_copy);
 			
 			//ArrayList<Long> topic_assignments_copy = new ArrayList<Long>(k_c.get(i));
@@ -223,7 +223,7 @@ public class SamplerState {
 		}
 		for(int i=0;i<customers_in_table.size();i++)
 		{
-			HashMap<Long,StringBuffer> customers_in_table_copy = new HashMap<Long,StringBuffer>(customers_in_table.get(i));
+			HashMap<Integer,StringBuffer> customers_in_table_copy = new HashMap<Integer,StringBuffer>(customers_in_table.get(i));
 			new_customers_in_table.add(customers_in_table_copy);
 		}
 		s.c = new_c;

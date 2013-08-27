@@ -16,6 +16,6 @@ public interface Likelihood {
 	 * @param list_index index of the list, the observation at the tables belong to.
 	 * @return
 	 */
-	public double computeTableLogLikelihood(ArrayList<Long> table_members,int list_index);
+	public double computeTableLogLikelihood(ArrayList<Integer> table_members,int list_index);
 
 }

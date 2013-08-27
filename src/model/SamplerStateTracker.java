@@ -55,22 +55,22 @@ public class SamplerStateTracker {
 			SamplerState state0 = new SamplerState(); //initial state		
 			//setting the state
 			SamplerState.setNum_data(num_data);
-			ArrayList<ArrayList<Long>> customer_assignments = new ArrayList<ArrayList<Long>>();
-			ArrayList<ArrayList<Long>> table_assignments = new ArrayList<ArrayList<Long>>();
+			ArrayList<ArrayList<Integer>> customer_assignments = new ArrayList<ArrayList<Integer>>();
+			ArrayList<ArrayList<Integer>> table_assignments = new ArrayList<ArrayList<Integer>>();
 			ArrayList<ArrayList<Long>> topic_assignments_table = new ArrayList<ArrayList<Long>>();
 			ArrayList<ArrayList<Long>> topic_assignments_customer = new ArrayList<ArrayList<Long>>();
-			ArrayList<HashMap<Long,StringBuffer>> list_customers_in_table = new  ArrayList<HashMap<Long,StringBuffer>>();
+			ArrayList<HashMap<Integer,StringBuffer>> list_customers_in_table = new  ArrayList<HashMap<Integer,StringBuffer>>();
 			HashMap<Long,Long> count_each_topic = new HashMap<Long,Long>();
 			int num_topics = 100; //setting the initial number of topics to 100
 			Random gen = new Random();			
 			for(int i=0;i<list_observations.size();i++)		//keeping i as int, hoping that the number of cities/documents will be no greater than the size of integers
 			{
-				ArrayList<Long> customer_assignment_per_list = new ArrayList<Long>();
-				ArrayList<Long> table_assignment_per_list = new ArrayList<Long>();
+				ArrayList<Integer> customer_assignment_per_list = new ArrayList<Integer>();
+				ArrayList<Integer> table_assignment_per_list = new ArrayList<Integer>();
 				ArrayList<Long> topic_assignments_table_per_list = new ArrayList<Long>();
 				ArrayList<Long> topic_assignments_customer_per_list = new ArrayList<Long>();
-				HashMap<Long,StringBuffer> customers_in_table_per_list = new HashMap<Long,StringBuffer>(); 
-				for(long j=0;j<list_observations.get(i).size();j++) //note: the customers are indexed from 0
+				HashMap<Integer,StringBuffer> customers_in_table_per_list = new HashMap<Integer,StringBuffer>(); 
+				for(int j=0;j<list_observations.get(i).size();j++) //note: the customers are indexed from 0
 				{//initializing the customer assignments for each point to itself and hence each customer in its own table
 					customer_assignment_per_list.add(j); 
 					table_assignment_per_list.add(j);

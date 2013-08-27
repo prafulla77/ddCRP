@@ -21,7 +21,7 @@ public class DirichletLikelihood implements Likelihood {
 
 	
 	@Override
-	public double computeTableLogLikelihood(ArrayList<Long> table_members,
+	public double computeTableLogLikelihood(ArrayList<Integer> table_members,
 			int list_index) {
 		
 		//get the observations
