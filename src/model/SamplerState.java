@@ -180,6 +180,7 @@ public class SamplerState {
 	 */
 	public String getCustomers_in_table(int table_id,int list_index)
 	{		
+		//System.out.println(customers_in_table.get(list_index).get(new Long(table_id)));
 		return customers_in_table.get(list_index).get(new Long(table_id)).toString();
 	}
 	/**
@@ -216,10 +217,14 @@ public class SamplerState {
 			new_c.add(customer_assignments_copy);
 			ArrayList<Long> table_assignments_copy = new ArrayList<Long>(t.get(i));
 			new_t.add(table_assignments_copy);
-			HashMap<Long,StringBuffer> customers_in_table_copy = new HashMap<Long,StringBuffer>(customers_in_table.get(i));
-			new_customers_in_table.add(customers_in_table_copy);
+			
 			//ArrayList<Long> topic_assignments_copy = new ArrayList<Long>(k_c.get(i));
 			//new_k_c.add(topic_assignments_copy);
+		}
+		for(int i=0;i<customers_in_table.size();i++)
+		{
+			HashMap<Long,StringBuffer> customers_in_table_copy = new HashMap<Long,StringBuffer>(customers_in_table.get(i));
+			new_customers_in_table.add(customers_in_table_copy);
 		}
 		s.c = new_c;
 		s.t = new_t;

@@ -47,18 +47,20 @@ public class Driver {
 			
 			ArrayList<ArrayList<Double>> list_observations = Data.getObservations();	
 			SamplerStateTracker.initializeSamplerState(list_observations);
-			SamplerStateTracker.samplerStates.get(0).prettyPrint(System.out);
+			//SamplerStateTracker.samplerStates.get(0).prettyPrint(System.out);
 			Likelihood l = new DirichletLikelihood();
 			//do sampling		
-			GibbsSampler.doSampling(l);
+			for(int i=0;i<5;i++)
+				GibbsSampler.doSampling(l);
 			
 			long diff = System.currentTimeMillis() - init_time; 
-			System.out.println("Time taken for Sampling "+(double)diff/1000+" seconds");
+			System.out.println("Time taken for Sampling "+(double)diff/1000+" seconds");			
 		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		
 	}
 

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -40,21 +41,33 @@ import data.Data;
 public class GibbsSampler {
 	
 	/**
-	 * for maintaining a list of empty tables, which can be assigned when split of tables happen.
+	 * A list of queues, each queue for maintaining a list of empty tables, which can be assigned when split of tables happen.
 	 */
-	private static Queue<Integer> emptyTables;
+	private static List<Queue<Integer>> emptyTables = new ArrayList<Queue<Integer>>();
 	
 	private final static Logger LOGGER = Logger.getLogger(GibbsSampler.class
 		      .getName());
 	
-
-	public static void doSampling(Likelihood l) throws SecurityException, IOException
-	{
-		LOGGER.setLevel(Level.FINE);
-		FileHandler logFileHandler = new FileHandler("log.txt");
-		logFileHandler.setFormatter(new SimpleFormatter());
-		LOGGER.addHandler(logFileHandler);
+	static{
+		try {		
+			LOGGER.setLevel(Level.FINE);
+			FileHandler logFileHandler;
+			logFileHandler = new FileHandler("log.txt");
+			logFileHandler.setFormatter(new SimpleFormatter());
+			LOGGER.addHandler(logFileHandler);
 		
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+		
+	
+	public static void doSampling(Likelihood l) 
+	{
 		//create the copy of the latest sampler state and assign it to the new one
 		SamplerState s = SamplerStateTracker.samplerStates.get(SamplerStateTracker.current_iter).copy();
 		SamplerStateTracker.samplerStates.add(s);
@@ -62,20 +75,24 @@ public class GibbsSampler {
 		SamplerStateTracker.current_iter = SamplerStateTracker.current_iter + 1;		
 				
 		ArrayList<ArrayList<Double>> all_observations = Data.getObservations();
+		if(emptyTables.size()!=all_observations.size()) //if queue already not initialized, then initialize an empty queue		
+			for(int i=0;i<all_observations.size();i++)
+				emptyTables.add(new LinkedList<Integer>());
+		
 		//Sampling for each list (city/document)
-		for(int i=0;i<1;i++)
-		{
-			LOGGER.log(Level.FINE, "Starting to sample for list "+i);
-			emptyTables = new LinkedList<Integer>(); // a new queue for a new list
-			ArrayList<Double> list = all_observations.get(i); //each city in our case
-			//For each observation in the list sample customer assignments (for each venue in a city)
-			for(int j=0;j<list.size();j++) //Concern: No of observation in a list should not cross the size of integers
-			{				
-				//sample customer link for this observation
-				sampleLink(j,i,l); //sending the list (city) and the index so that the observation can be accessed
-			}
-			LOGGER.log(Level.FINE, "Done for list "+i);
-		}			
+		
+			for(int i=0;i<1;i++)
+			{
+				LOGGER.log(Level.FINE, "Starting to sample for list "+i);			
+				ArrayList<Double> list = all_observations.get(i); //each city in our case
+				//For each observation in the list sample customer assignments (for each venue in a city)
+				for(int j=0;j<list.size();j++) //Concern: No of observation in a list should not cross the size of integers
+				{				
+					//sample customer link for this observation
+					sampleLink(j,i,l); //sending the list (city) and the index so that the observation can be accessed
+				}
+				LOGGER.log(Level.FINE, "Done for list "+i);
+		}
 	}
 	
 	private static void sampleLink(int index, int list_index,Likelihood ll)
@@ -156,7 +173,7 @@ public class GibbsSampler {
 			 //Ok, now since the table has split, update the sampler state accordingly
 			 s.setT(s.getT()+1); //incrementing the number of tables
 			 s.setC(null, index, list_index); //since this customer has 'no' customer assignment as of now
-			 int new_table_id = emptyTables.remove(); //getting an empty table
+			 int new_table_id = emptyTables.get(list_index).remove(); //getting an empty table
 			 LOGGER.log(Level.FINE, "The new table id after splitting is "+new_table_id);
 			 
 			 for(Long l:new_table_members) //setting the table assignment to the new table number			 
@@ -168,7 +185,7 @@ public class GibbsSampler {
 			sb.append(old_table_members.get(old_table_members.size()-1));
 			s.setCustomers_in_table(sb, old_table_id.intValue(), list_index);
 			
-			table_id = new Long( new_table_id); //updating, since this is the new table_id of the current customer we are trying to sample for.
+			table_id = new Long(new_table_id); //updating, since this is the new table_id of the current customer we are trying to sample for.
 			sb = new StringBuffer();
 			for(int i=0;i<new_table_members.size()-1;i++)			
 				sb.append(new_table_members.get(i)).append(",");
@@ -205,6 +222,7 @@ public class GibbsSampler {
 				{					
 					//get the proposed table members
 					String s_table_proposed_members = s.getCustomers_in_table(table_proposed.intValue(), list_index);
+					System.out.println(table_proposed.intValue());
 					String[] table_proposed_members = s_table_proposed_members.split(",");
 					//create an arraylist of the members
 					ArrayList<Long> proposed_table_members = new ArrayList<Long>();
@@ -224,7 +242,7 @@ public class GibbsSampler {
 		
 		Long assigned_table = s.get_t(customer_assignment_index, list_index);
 		s.setC(new Long(customer_assignment_index), index, list_index); //setting the customer assignment
-		if(assigned_table != table_id) //this is a join of two tables 
+		if(!assigned_table.equals(table_id)) //this is a join of two tables 
 		{
 			LOGGER.log(Level.FINE, "Table "+table_id+" joins with "+assigned_table);
 			s.setT(s.getT()-1); //since there is a join, there is a decrease by 1.			
@@ -239,7 +257,7 @@ public class GibbsSampler {
 			//Then, update the orig_table to null
 			s.setCustomers_in_table(null,table_id.intValue(), list_index);
 			//Atlast, enqueue this table_id, since this table is empty
-			emptyTables.add(table_id.intValue());
+			emptyTables.get(list_index).add(table_id.intValue());
 		}
 		
 		LOGGER.log(Level.FINE, " DONE Sampling link for index "+index+" list_index "+list_index);
