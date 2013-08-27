@@ -1,23 +1,27 @@
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
-import org.jgraph.graph.DefaultEdge;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.traverse.DepthFirstIterator;
+import org.la4j.vector.Vector;
+import org.la4j.vector.dense.BasicVector;
 
-import sampler.GibbsSampler;
+import Likelihood.DirichletLikelihood;
+import Likelihood.Likelihood;
 
+import model.HyperParameters;
 import model.SamplerStateTracker;
-
+import sampler.GibbsSampler;
+import util.Util;
 import data.Data;
 
 
 public class Driver {
+	
+	public static int vocab_size = 419; //TO-DO, will take this as a command line param
 
 	/**
 	 * @param args
@@ -25,11 +29,37 @@ public class Driver {
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		// TODO Auto-generated method stub
-		ArrayList<ArrayList<Double>> list_observations = Data.getObservations();	
-		SamplerStateTracker.initializeSamplerState(list_observations);
-		SamplerStateTracker.samplerStates.get(0).prettyPrint(System.out);
-		//do sampling
-		GibbsSampler.doSampling();	
+		try {
+			//setup logging
+//			Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+//			logger.setLevel(Level.FINE);
+//			FileHandler logFileHandler = new FileHandler("log.txt");
+//			logFileHandler.setFormatter(new SimpleFormatter());
+//			logger.addHandler(logFileHandler);
+		
+			long init_time = System.currentTimeMillis();
+			//set the hyper-parameters
+			ArrayList<Double> dirichlet_params = new ArrayList<Double>(vocab_size);
+			for(int i=0;i<vocab_size;i++)
+				dirichlet_params.add(0.1);
+			HyperParameters.dirichletParam = dirichlet_params;
+			HyperParameters.ddcrp_prior = 0.75;
+			
+			ArrayList<ArrayList<Double>> list_observations = Data.getObservations();	
+			SamplerStateTracker.initializeSamplerState(list_observations);
+			SamplerStateTracker.samplerStates.get(0).prettyPrint(System.out);
+			Likelihood l = new DirichletLikelihood();
+			//do sampling		
+			GibbsSampler.doSampling(l);
+			
+			long diff = System.currentTimeMillis() - init_time; 
+			System.out.println("Time taken for Sampling "+(double)diff/1000+" seconds");
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }
