@@ -82,7 +82,7 @@ public class GibbsSampler {
 		
 		//Sampling for each list (city/document)
 		
-			for(int i=0;i<1;i++)
+			for(int i=0;i<all_observations.size();i++)
 			{
 				LOGGER.log(Level.FINE, "Starting to sample for list "+i);			
 				ArrayList<Double> list = all_observations.get(i); //each city in our case
@@ -257,11 +257,8 @@ public class GibbsSampler {
 			s.setCustomers_in_table(null,table_id, list_index);
 			//Atlast, enqueue this table_id, since this table is empty
 			emptyTables.get(list_index).add(table_id);
-		}
-		
+		}		
 		LOGGER.log(Level.FINE, " DONE Sampling link for index "+index+" list_index "+list_index);
-		
-	
 	}
 
 	/**

@@ -1,5 +1,7 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -54,7 +56,9 @@ public class Driver {
 				GibbsSampler.doSampling(l);
 			
 			long diff = System.currentTimeMillis() - init_time; 
-			System.out.println("Time taken for Sampling "+(double)diff/1000+" seconds");			
+			System.out.println("Time taken for Sampling "+(double)diff/1000+" seconds");		
+			for(int i=0;i<list_observations.size();i++)
+				Util.printTableConfiguration(i, new PrintStream(new File("table_configuration.txt")));
 		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

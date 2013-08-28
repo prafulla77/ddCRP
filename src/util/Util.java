@@ -1,8 +1,12 @@
 package util;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import model.SamplerState;
+import model.SamplerStateTracker;
 
 public class Util {
 
@@ -34,6 +38,28 @@ public class Util {
 				return i;
 		
 		return -1;		
+	}
+	
+	/**
+	 * Prints the table configuration for the current (last) state of the sampler for a given list index
+	 * @param list_index
+	 */
+	public static void printTableConfiguration(int list_index, PrintStream out)
+	{
+		SamplerState s = SamplerStateTracker.returnCurrentSamplerState();
+		int count  = 0;
+		for(int table_id=0;table_id<s.getC().get(list_index).size();table_id++)
+		{
+			String customers = s.getCustomers_in_table(table_id, list_index);
+			if(customers != null)
+			{
+				count++;
+				String[] eachCustomers = customers.split(",");
+				out.println("Table "+table_id+" Count "+eachCustomers.length+" :\t"+customers);
+				
+			}
+		}
+		out.println("There are "+count+" occupied tables");
 	}
 
 }

@@ -181,6 +181,8 @@ public class SamplerState {
 	public String getCustomers_in_table(int table_id,int list_index)
 	{		
 		//System.out.println(customers_in_table.get(list_index).get(new Long(table_id)));
+		if(customers_in_table.get(list_index).get(table_id) == null)
+			return null;
 		return customers_in_table.get(list_index).get(table_id).toString();
 	}
 	/**
