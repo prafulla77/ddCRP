@@ -50,7 +50,7 @@ public class GibbsSampler {
 	
 	static{
 		try {		
-			LOGGER.setLevel(Level.FINE);
+			LOGGER.setLevel(Level.INFO);
 			FileHandler logFileHandler;
 			logFileHandler = new FileHandler("log.txt");
 			logFileHandler.setFormatter(new SimpleFormatter());
@@ -93,6 +93,7 @@ public class GibbsSampler {
 					sampleLink(j,i,l); //sending the list (city) and the index so that the observation can be accessed
 				}
 				LOGGER.log(Level.FINE, "Done for list "+i);
+				System.out.println("Done for list "+i);
 		}
 	}
 	

@@ -46,7 +46,7 @@ public class Driver {
 				dirichlet_params.add(0.1);
 			HyperParameters.dirichletParam = dirichlet_params;
 			HyperParameters.ddcrp_prior = 0.75;
-			
+//			
 			ArrayList<ArrayList<Double>> list_observations = Data.getObservations();	
 			SamplerStateTracker.initializeSamplerState(list_observations);
 			//SamplerStateTracker.samplerStates.get(0).prettyPrint(System.out);
@@ -59,7 +59,15 @@ public class Driver {
 			System.out.println("Time taken for Sampling "+(double)diff/1000+" seconds");		
 			for(int i=0;i<list_observations.size();i++)
 				Util.printTableConfiguration(i, new PrintStream(new File("table_configuration.txt")));
-		
+			
+//			DirichletLikelihood l = new DirichletLikelihood();
+//			ArrayList<Integer> t = new ArrayList<Integer>();
+//			t.add(1);
+//			t.add(2);
+//			t.add(3);
+//			
+//			System.out.println(l.computeTableLogLikelihood(t, 0));
+//		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

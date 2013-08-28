@@ -40,22 +40,23 @@ public class DirichletLikelihood implements Likelihood {
 		
 		//get the dirichlet hyper-parameter
 		ArrayList<Double> dirichletParams = HyperParameters.dirichletParam;
-		double sum_alpha = 0, sum_venue_cat_alpha=0, sum_log_gamma_sum_venue_cat_alpha = 0, sum_log_gamma_sum_alpha = 0;
+		double  sum_venue_cat_alpha=0, sum_log_gamma_sum_venue_cat_alpha = 0;
 		
 		for(int i=0;i<dirichletParams.size();i++) //loop for each possible venue category
 		{
 			Integer category_count = venue_category_count.get(new Double(i));
 			if(category_count == null) 
 				category_count = 0; //in case no venue of a certain category isnt present, the count is 0
-			
-			sum_alpha = sum_alpha + dirichletParams.get(i);
+						
 			sum_venue_cat_alpha = sum_venue_cat_alpha + dirichletParams.get(i) + category_count;
-			sum_log_gamma_sum_venue_cat_alpha = sum_log_gamma_sum_venue_cat_alpha + Gamma.logGamma(dirichletParams.get(i)+category_count);
-			sum_log_gamma_sum_alpha = sum_log_gamma_sum_alpha + Gamma.logGamma(dirichletParams.get(i));
-			
+			sum_log_gamma_sum_venue_cat_alpha = sum_log_gamma_sum_venue_cat_alpha + Gamma.logGamma(dirichletParams.get(i)+category_count);			
 		}
 		
-		double log_likelihood = sum_log_gamma_sum_venue_cat_alpha + Gamma.logGamma(sum_alpha) - (Gamma.logGamma(sum_venue_cat_alpha) + sum_log_gamma_sum_alpha );
+		double log_numerator = sum_log_gamma_sum_venue_cat_alpha - Gamma.logGamma(sum_venue_cat_alpha);
+		//double log_denominator = sum_log_gamma_sum_alpha - Gamma.logGamma(sum_alpha); //NO need to compute the denominator as it is same for all tables, given an alpha
+		
+		
+		double log_likelihood = log_numerator;
 		
 		return log_likelihood;
 	}
