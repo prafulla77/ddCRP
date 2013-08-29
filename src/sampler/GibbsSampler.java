@@ -282,8 +282,7 @@ public class GibbsSampler {
 			union_list.add(member);
 		double table_union_loglikelihood = l.computeTableLogLikelihood(union_list, list_index); 
 		
-		double change_in_log_likelihood = table_union_loglikelihood - (orig_table_loglikelihood + proposed_table_loglikelihood);
-		
+		double change_in_log_likelihood = table_union_loglikelihood - (orig_table_loglikelihood + proposed_table_loglikelihood);		
 		return change_in_log_likelihood;
 	}
 }

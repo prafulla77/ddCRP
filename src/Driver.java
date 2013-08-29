@@ -53,13 +53,18 @@ public class Driver {
 			Likelihood l = new DirichletLikelihood();
 			//do sampling		
 			for(int i=0;i<5;i++)
+			{
 				GibbsSampler.doSampling(l);
+				System.out.println("Iteration "+i+" done");
+				System.out.println("Took "+(System.currentTimeMillis() - init_time)+" seconds");
+			}
 			
 			long diff = System.currentTimeMillis() - init_time; 
 			System.out.println("Time taken for Sampling "+(double)diff/1000+" seconds");		
 			for(int i=0;i<list_observations.size();i++)
-				Util.printTableConfiguration(i, new PrintStream(new File("table_configuration.txt")));
+				Util.printTableConfiguration(i, new PrintStream("table_configuration"+i+".txt"));
 			
+//			
 //			DirichletLikelihood l = new DirichletLikelihood();
 //			ArrayList<Integer> t = new ArrayList<Integer>();
 //			t.add(1);
