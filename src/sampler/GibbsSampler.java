@@ -35,6 +35,8 @@ import Likelihood.Likelihood;
 import data.Data;
 
 /**
+ * Gibbs Sampler for Distance Dependent Chinese Restaurant Process. This is the implementation
+ * of the sampling process described in <a href="http://www.cs.princeton.edu/~blei/papers/BleiFrazier2011.pdf"> paper </a>
  * @author rajarshd
  *
  */
@@ -65,7 +67,10 @@ public class GibbsSampler {
 		}
 	}
 		
-	
+	/**
+	 * 
+	 * @param l
+	 */	
 	public static void doSampling(Likelihood l) 
 	{
 		//create the copy of the latest sampler state and assign it to the new one
@@ -97,6 +102,13 @@ public class GibbsSampler {
 		}
 	}
 	
+	/**
+	 * This method samples a link for each observation. The parameters are index of the sample
+	 * and the index of the list it belongs to.
+	 * @param index
+	 * @param list_index
+	 * @param ll
+	 */
 	private static void sampleLink(int index, int list_index,Likelihood ll)
 	{
 		LOGGER.log(Level.FINE, "Sampling link for index "+index+" list_index "+list_index);
