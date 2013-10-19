@@ -1,23 +1,13 @@
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
-import org.la4j.vector.Vector;
-import org.la4j.vector.dense.BasicVector;
-
-import Likelihood.DirichletLikelihood;
-import Likelihood.Likelihood;
 
 import model.HyperParameters;
 import model.SamplerStateTracker;
 import sampler.GibbsSampler;
 import util.Util;
+import Likelihood.DirichletLikelihood;
+import Likelihood.Likelihood;
 import data.Data;
 
 
@@ -51,8 +41,11 @@ public class Driver {
 			SamplerStateTracker.initializeSamplerState(list_observations);
 			//SamplerStateTracker.samplerStates.get(0).prettyPrint(System.out);
 			Likelihood l = new DirichletLikelihood();
+			
 			//do sampling		
-			for(int i=0;i<5;i++)
+			SamplerStateTracker.max_iter = Integer.parseInt(args[1]);
+			System.out.println("Gibbs Sampler will run for "+SamplerStateTracker.max_iter+" iterations.");
+			for(int i=0;i<SamplerStateTracker.max_iter;i++)
 			{
 				long init_time_iter = System.currentTimeMillis();
 				GibbsSampler.doSampling(l);
