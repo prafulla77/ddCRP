@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import model.HyperParameters;
 import model.SamplerStateTracker;
 import sampler.GibbsSampler;
+import test.Test;
 import util.Util;
 import Likelihood.DirichletLikelihood;
 import Likelihood.Likelihood;
@@ -42,8 +43,18 @@ public class Driver {
 			//SamplerStateTracker.samplerStates.get(0).prettyPrint(System.out);
 			Likelihood l = new DirichletLikelihood();
 			
+			//BEFORE DOING SAMPLING, LETS SEPARATE SOME TEST DATA
+			Test.generateTestSamples(); //it will populate appropriate data structures which will be accessed later in the sampling class
+			
+			
 			//do sampling		
-			SamplerStateTracker.max_iter = Integer.parseInt(args[1]);
+			if(args.length==0) //if not called from command line, run for this many number of iterations
+				SamplerStateTracker.max_iter = 2;
+			else
+			{			
+				SamplerStateTracker.max_iter = Integer.parseInt(args[1]);
+			}
+			
 			System.out.println("Gibbs Sampler will run for "+SamplerStateTracker.max_iter+" iterations.");
 			for(int i=0;i<SamplerStateTracker.max_iter;i++)
 			{

@@ -28,6 +28,7 @@ import org.jgrapht.traverse.DepthFirstIterator;
 import org.la4j.matrix.sparse.CRSMatrix;
 import org.la4j.vector.Vector;
 
+import test.Test;
 import util.Util;
 
 import Likelihood.Likelihood;
@@ -91,11 +92,16 @@ public class GibbsSampler {
 			{
 				LOGGER.log(Level.FINE, "Starting to sample for list "+i);			
 				ArrayList<Double> list = all_observations.get(i); //each city in our case
-				//For each observation in the list sample customer assignments (for each venue in a city)
+				
+				//Get the set of test indices, those which we should ignore while sampling
+				HashMap<Integer,Integer> venue_ids = Test.getTest_venue_ids(i);
+				
+				//For each observation in the list sample customer assignments (for each venue in a city)				
 				for(int j=0;j<list.size();j++) //Concern: No of observation in a list should not cross the size of integers
 				{				
 					//sample customer link for this observation
-					sampleLink(j,i,l); //sending the list (city) and the index so that the observation can be accessed
+					if(venue_ids.get(j)==null) //if it is not a part of the test sample.
+						sampleLink(j,i,l); //sending the list (city) and the index so that the observation can be accessed					
 				}
 				LOGGER.log(Level.FINE, "Done for list "+i);
 				//System.out.println("Done for list "+i);
