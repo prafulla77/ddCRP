@@ -101,7 +101,7 @@ public class GibbsSampler {
 				{				
 					//sample customer link for this observation
 					if(venue_ids.get(j)==null) //if it is not a part of the test sample.
-						sampleLink(j,i,l); //sending the list (city) and the index so that the observation can be accessed					
+						sampleLink(j,i,l,venue_ids); //sending the list (city) and the index so that the observation can be accessed					
 				}
 				LOGGER.log(Level.FINE, "Done for list "+i);
 				//System.out.println("Done for list "+i);
@@ -115,7 +115,7 @@ public class GibbsSampler {
 	 * @param list_index
 	 * @param ll
 	 */
-	private static void sampleLink(int index, int list_index,Likelihood ll)
+	private static void sampleLink(int index, int list_index, Likelihood ll, HashMap<Integer,Integer> venue_ids)
 	{
 		LOGGER.log(Level.FINE, "Sampling link for index "+index+" list_index "+list_index);
 		
@@ -215,7 +215,12 @@ public class GibbsSampler {
 		//get the distance matrix for Prior computation
 		ArrayList<CRSMatrix> distanceMatrices = Data.getDistanceMatrices();
 		CRSMatrix distance_matrix = distanceMatrices.get(list_index); // getting the correct distance matrix 
-		Vector priors = distance_matrix.getRow(index);		
+		Vector priors = distance_matrix.getRow(index);
+		//Iterate throught the Test indices, and zero out the prior for any test data, removing the possibility of linking to testing data
+		for (Integer id : venue_ids.keySet()) {
+    	priors.set(id,0);
+		}
+		//Set the prior for self linkage
 		priors.set(index, HyperParameters.ddcrp_prior); //since according to the ddcrp prior, the prob of a customer forming a link to itself is given by \alpha
 		double sum = 0;
 		for(int i=0;i<priors.length();i++)
