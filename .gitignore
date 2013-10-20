@@ -1,3 +1,4 @@
 /Data/*
 /bin/*
 .DS_Store
+/tables/*
