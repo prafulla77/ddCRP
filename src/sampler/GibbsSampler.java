@@ -31,7 +31,7 @@ import org.la4j.vector.Vector;
 import test.Test;
 import util.Util;
 
-import Likelihood.DirichletLikelihood;
+import Likelihood.Likelihood;
 
 import data.Data;
 
@@ -72,7 +72,7 @@ public class GibbsSampler {
 	 * 
 	 * @param l
 	 */	
-	public static void doSampling(DirichletLikelihood l, Test t) 
+	public static void doSampling(Likelihood l, Test t) 
 	{
 		//create the copy of the latest sampler state and assign it to the new one
 		SamplerState s = SamplerStateTracker.samplerStates.get(SamplerStateTracker.current_iter).copy();
@@ -116,7 +116,7 @@ public class GibbsSampler {
 	 * @param list_index
 	 * @param ll
 	 */
-	private static void sampleLink(int index, int list_index, DirichletLikelihood ll, HashMap<Integer,Integer> venue_ids)
+	private static void sampleLink(int index, int list_index, Likelihood ll, HashMap<Integer,Integer> venue_ids)
 	{
 		LOGGER.log(Level.FINE, "Sampling link for index "+index+" list_index "+list_index);
 		
@@ -294,7 +294,7 @@ public class GibbsSampler {
 	 * @return
 	 
 	 */
-	private static double compute_change_in_likelihood(DirichletLikelihood l,ArrayList<Integer> orig_table_members,ArrayList<Integer> proposed_table_members,int list_index )
+	private static double compute_change_in_likelihood(Likelihood l,ArrayList<Integer> orig_table_members,ArrayList<Integer> proposed_table_members,int list_index )
 	{
 		double orig_table_loglikelihood = l.computeTableLogLikelihood(orig_table_members, list_index);
 		double proposed_table_loglikelihood = l.computeTableLogLikelihood(proposed_table_members, list_index);

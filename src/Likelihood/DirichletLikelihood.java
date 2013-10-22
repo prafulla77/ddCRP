@@ -17,17 +17,12 @@ import data.Data;
  * @author rajarshd
  *
  */
-public class DirichletLikelihood implements Likelihood {
+public class DirichletLikelihood extends Likelihood {
 
-	private HyperParameters hyperParameters;
 	private static HashMap<Double,Double> cached_gamma_values = new HashMap<Double,Double>();
 	
 	public DirichletLikelihood(HyperParameters h) {
 		hyperParameters = h;
-	}
-
-	public HyperParameters getHyperParameters() {
-		return(hyperParameters);
 	}
 
 	@Override

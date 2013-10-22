@@ -41,7 +41,7 @@ public class Driver {
 			ArrayList<ArrayList<Double>> list_observations = Data.getObservations();	
 			SamplerStateTracker.initializeSamplerState(list_observations);
 			//SamplerStateTracker.samplerStates.get(0).prettyPrint(System.out);
-			DirichletLikelihood l = new DirichletLikelihood(h);
+			Likelihood l = new DirichletLikelihood(h);
 			
 			//BEFORE DOING SAMPLING, LETS SEPARATE SOME TEST DATA
 
