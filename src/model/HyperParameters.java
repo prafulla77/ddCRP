@@ -12,10 +12,29 @@ public class HyperParameters {
 	/**
 	 * The Dirichlet hyper params
 	 */
-	public static ArrayList<Double> dirichletParam ;
+	private ArrayList<Double> dirichletParam;
 	
 	/**
-	 * The ddCRP prior
+	 * The self link probability in the ddCRP prior
 	 */
-	public static double ddcrp_prior;
+	private double selfLinkProb;
+
+	public HyperParameters(ArrayList<Double> dirichlet, double ddcrp) {
+		dirichletParam = dirichlet;
+		selfLinkProb = ddcrp;
+	}
+
+	/**
+	 * Getter for the dirichlet parameter
+	 */
+	public ArrayList<Double> getDirichletParam() {
+		return(dirichletParam);
+	}
+
+  /**
+   * Getter for the self link probability
+   */
+	public double getSelfLinkProb() {
+		return(selfLinkProb);
+	}
 }

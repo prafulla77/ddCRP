@@ -31,7 +31,7 @@ import org.la4j.vector.Vector;
 import test.Test;
 import util.Util;
 
-import Likelihood.Likelihood;
+import Likelihood.DirichletLikelihood;
 
 import data.Data;
 
@@ -72,7 +72,7 @@ public class GibbsSampler {
 	 * 
 	 * @param l
 	 */	
-	public static void doSampling(Likelihood l) 
+	public static void doSampling(DirichletLikelihood l, Test t) 
 	{
 		//create the copy of the latest sampler state and assign it to the new one
 		SamplerState s = SamplerStateTracker.samplerStates.get(SamplerStateTracker.current_iter).copy();
@@ -94,8 +94,9 @@ public class GibbsSampler {
 				ArrayList<Double> list = all_observations.get(i); //each city in our case
 				
 				//Get the set of test indices, those which we should ignore while sampling
-				HashMap<Integer,Integer> venue_ids = Test.getTest_venue_ids(i);
-				
+				//HashMap<Integer,Integer> venue_ids = Test.getTest_venue_ids(i);
+				HashMap<Integer,Integer> venue_ids = t.getTestVenueIdsForCity(i);
+
 				//For each observation in the list sample customer assignments (for each venue in a city)				
 				for(int j=0;j<list.size();j++) //Concern: No of observation in a list should not cross the size of integers
 				{				
@@ -115,7 +116,7 @@ public class GibbsSampler {
 	 * @param list_index
 	 * @param ll
 	 */
-	private static void sampleLink(int index, int list_index, Likelihood ll, HashMap<Integer,Integer> venue_ids)
+	private static void sampleLink(int index, int list_index, DirichletLikelihood ll, HashMap<Integer,Integer> venue_ids)
 	{
 		LOGGER.log(Level.FINE, "Sampling link for index "+index+" list_index "+list_index);
 		
@@ -221,7 +222,7 @@ public class GibbsSampler {
     	priors.set(id,0);
 		}
 		//Set the prior for self linkage
-		priors.set(index, HyperParameters.ddcrp_prior); //since according to the ddcrp prior, the prob of a customer forming a link to itself is given by \alpha
+		priors.set(index, ll.getHyperParameters().getSelfLinkProb()); //since according to the ddcrp prior, the prob of a customer forming a link to itself is given by \alpha
 		double sum = 0;
 		for(int i=0;i<priors.length();i++)
 			sum = sum + priors.get(i);
@@ -291,8 +292,9 @@ public class GibbsSampler {
 	 * @param orig_table_members
 	 * @param proposed_table_members
 	 * @return
+	 
 	 */
-	private static double compute_change_in_likelihood(Likelihood l,ArrayList<Integer> orig_table_members,ArrayList<Integer> proposed_table_members,int list_index )
+	private static double compute_change_in_likelihood(DirichletLikelihood l,ArrayList<Integer> orig_table_members,ArrayList<Integer> proposed_table_members,int list_index )
 	{
 		double orig_table_loglikelihood = l.computeTableLogLikelihood(orig_table_members, list_index);
 		double proposed_table_loglikelihood = l.computeTableLogLikelihood(proposed_table_members, list_index);

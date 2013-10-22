@@ -19,8 +19,17 @@ import data.Data;
  */
 public class DirichletLikelihood implements Likelihood {
 
+	private HyperParameters hyperParameters;
 	private static HashMap<Double,Double> cached_gamma_values = new HashMap<Double,Double>();
 	
+	public DirichletLikelihood(HyperParameters h) {
+		hyperParameters = h;
+	}
+
+	public HyperParameters getHyperParameters() {
+		return(hyperParameters);
+	}
+
 	@Override
 	public double computeTableLogLikelihood(ArrayList<Integer> table_members,
 			int list_index) {
@@ -40,7 +49,7 @@ public class DirichletLikelihood implements Likelihood {
 		}
 		
 		//get the dirichlet hyper-parameter
-		ArrayList<Double> dirichletParams = HyperParameters.dirichletParam;
+		ArrayList<Double> dirichletParams = hyperParameters.getDirichletParam();
 		double  sum_venue_cat_alpha=0, sum_log_gamma_sum_venue_cat_alpha = 0,sum_alpha =0,sum_log_gamma_alpha=0 ;
 		
 		for(int i=0;i<dirichletParams.size();i++) //loop for each possible venue category

@@ -7,15 +7,20 @@ package test;
  */
 public class TestSample {
 
-	private int city_index; //city of the venue
-	private int list_index; //index of the venue within the list of venues in a city
-	private double venue_category; // the observed category of the venue
-	
-	
-	public TestSample(int list_index, int city_index, double venue_category)
+	private int cityIndex; //city of the venue
+	private int listIndex; //index of the venue within the list of venues in a city
+	private double venueCategory; // the observed category of the venue  QUESTION: WHY DOUBLE?
+
+		
+	public TestSample(int listIndex, int cityIndex, double venueCategory)
 	{
-		list_index = list_index;
-		city_index = city_index;
-		venue_category = venue_category;
+		listIndex = listIndex;
+		cityIndex = cityIndex;
+		venueCategory = venueCategory;
 	}
+
+	public int getCityIndex() { return cityIndex; }
+	public int getListIndex() { return listIndex; }
+	public double getVenueCategory() { return venueCategory; }
+
 }
