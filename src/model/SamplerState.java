@@ -38,7 +38,7 @@ public class SamplerState {
 	/**
 	 * This stores the topic assignments for each data point (which is basically the topic assignment at the given table they are sitting at)
 	 */
-	private ArrayList<ArrayList<Long>> k_c;
+	private ArrayList<ArrayList<Long>> k_c = new ArrayList<ArrayList<Long>>();
 	
 	/**
 	 * This stores the topic assignments for each table;
@@ -246,5 +246,27 @@ public class SamplerState {
 		out.println("Total number of topics "+K);
 	}
 	
-	
+	/**
+	 * equals comparator for SamplerStates, just checks the customer assignments and topic assignments
+	 */
+	@Override
+	public boolean equals(Object obj) 
+	{
+		if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof SamplerState))return false;	
+		SamplerState s = (SamplerState) obj;
+		// return (this.c.equals(s.getC()) && this.k_c.equals(s.getK_c()));
+		return c.equals(s.getC());  // need to take into account k_c.  for now its buggy because of null.
+	}
+
+	/**
+	 * Overrids hashCode based on c and k_c.  This concatenates the individual hashCodes as strings,
+	 * then computes the hashCode of the resulting unique String.
+	 */
+	@Override
+	public int hashCode() {
+		// String s = String.valueOf(this.c.hashCode()) + ":" + String.valueOf(this.k_c.hashCode());
+		return c.hashCode();  // need to take into account k_c too.  for now its buggy because of null.
+	}
 }

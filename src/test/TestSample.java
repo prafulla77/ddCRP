@@ -14,13 +14,18 @@ public class TestSample {
 		
 	public TestSample(int listIndex, int cityIndex, double venueCategory)
 	{
-		listIndex = listIndex;
-		cityIndex = cityIndex;
-		venueCategory = venueCategory;
+		this.listIndex = listIndex;
+		this.cityIndex = cityIndex;
+		this.venueCategory = venueCategory;
 	}
 
 	public int getCityIndex() { return cityIndex; }
 	public int getListIndex() { return listIndex; }
 	public double getVenueCategory() { return venueCategory; }
 
+	public String toJson() {
+		return "{" + "cityIndex:" + String.valueOf(cityIndex) + "," +
+		             "listIndex:" + String.valueOf(listIndex) + "," +
+		             "venueCategory:" + String.valueOf(venueCategory) + "}";
+	}
 }

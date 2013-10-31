@@ -16,7 +16,7 @@ import data.Data;
 
 public class Driver {
   
-  public static int vocab_size = 419; //TO-DO, will take this as a command line param
+  public static final int VOCAB_SIZE = 419; //TO-DO, will take this as a command line param
 
   /**
    * @param args
@@ -38,10 +38,10 @@ public class Driver {
       t.generateTestSamples();
 
 
-      ArrayList<Double> dirichletParams = new ArrayList<Double>(vocab_size);
-      for(int i=0;i<vocab_size;i++)
+      ArrayList<Double> dirichletParams = new ArrayList<Double>(VOCAB_SIZE);
+      for(int i=0;i<VOCAB_SIZE;i++)
         dirichletParams.add(0.1);
-      HyperParameters h = new HyperParameters(dirichletParams, 0.75);
+      HyperParameters h = new HyperParameters(VOCAB_SIZE, dirichletParams, 0.75);
       Experiment e = new Experiment(t, 1, numIter, h);
       e.runExperiment();
 

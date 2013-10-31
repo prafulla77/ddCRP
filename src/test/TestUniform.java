@@ -49,7 +49,7 @@ public class TestUniform extends Test {
       testSamples.add(cityTestSamples); //all the test samples for a city
       testVenueIds.add(cityVenueIds);
     }
-    
+
   }
 
   /**

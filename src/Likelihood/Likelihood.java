@@ -13,7 +13,7 @@ import model.HyperParameters;
  */
 abstract public class Likelihood {
 	
-  protected HyperParameters hyperParameters;
+  protected HyperParameters hyperParameters;  // Need to abstract the notion of Hyperparameters.  Currently its for Dir.
 
   public HyperParameters getHyperParameters() {
     return(hyperParameters);
