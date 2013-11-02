@@ -3,6 +3,7 @@ package model;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * This class is for storing the state of the sampler for an iteration.
@@ -246,6 +247,29 @@ public class SamplerState {
 		out.println("Total number of topics "+K);
 	}
 	
+	public ArrayList<HashSet<HashSet<Integer>>> getTableSeatingsSet() {
+		ArrayList<HashSet<HashSet<Integer>>> tableSeatings = new ArrayList<HashSet<HashSet<Integer>>>();
+		for (ArrayList<Integer> cityTables : t) {
+			HashMap<Integer, HashSet<Integer>> tableMembers = new HashMap<Integer, HashSet<Integer>>();
+			for (int i=0; i<cityTables.size(); i++) {
+				Integer tab = cityTables.get(i);
+				// check if the table is empty
+				if (tableMembers.get(tab) == null)
+					tableMembers.put(tab, new HashSet<Integer>());
+				HashSet<Integer> tableTabMembers = tableMembers.get(tab);
+				tableTabMembers.add(i);
+				tableMembers.put(tab, tableTabMembers);
+			}
+			// Now look over the hash, and put members in a set
+			HashSet<HashSet<Integer>> cityTableSeatings = new HashSet<HashSet<Integer>>();
+			for (HashSet<Integer> value : tableMembers.values()) {
+				cityTableSeatings.add(value);
+			}
+			tableSeatings.add(cityTableSeatings);
+		}
+		return tableSeatings;
+	}
+
 	/**
 	 * equals comparator for SamplerStates, just checks the customer assignments and topic assignments
 	 */
@@ -257,7 +281,8 @@ public class SamplerState {
     if (!(obj instanceof SamplerState))return false;	
 		SamplerState s = (SamplerState) obj;
 		// return (this.c.equals(s.getC()) && this.k_c.equals(s.getK_c()));
-		return c.equals(s.getC());  // need to take into account k_c.  for now its buggy because of null.
+		// return c.equals(s.getC());  // need to take into account k_c.  for now its buggy because of null.
+		return getTableSeatingsSet().equals(s.getTableSeatingsSet());
 	}
 
 	/**
@@ -267,6 +292,7 @@ public class SamplerState {
 	@Override
 	public int hashCode() {
 		// String s = String.valueOf(this.c.hashCode()) + ":" + String.valueOf(this.k_c.hashCode());
-		return c.hashCode();  // need to take into account k_c too.  for now its buggy because of null.
+		// return c.hashCode();  // need to take into account k_c too.  for now its buggy because of null.
+		return getTableSeatingsSet().hashCode();
 	}
 }

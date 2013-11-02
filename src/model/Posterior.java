@@ -31,6 +31,11 @@ public class Posterior {
    */
   public static ArrayList<SamplerState> states = new ArrayList<SamplerState>();
 
+  /** 
+   * The observations probabilities for each state in states (a multinomical vector)
+   */
+  public static ArrayList<ArrayList<Double>> tableObservationProbs = new ArrayList<ArrayList<Double>>();
+
   /**
    *  The burnin period (number of initial samples to ignore)
    */
@@ -47,9 +52,7 @@ public class Posterior {
   public static int normConstant;
 
   /**
-   * This initializes the sampler state. All observations point to themselves ie they have the customer assignments as themselves.
-   * As a result, each table consists of only one customer because of self links.
-   * @param list_observations
+   * Estimates the probabilities over states discovered by the sampler
    */
   public static void estimatePosterior(int b)
   {
@@ -110,5 +113,15 @@ public class Posterior {
     }    
     out.println(probs);
   }  
+
+
+  /* 
+   * Here we estimate the observed draw from the Dirichlet for each table for each unique sampler state.  
+   * That is, we would like to get the multinomial probability over observations for each table.  This is basically
+   * just word counts, plus pseudocounts
+   */
+  public statis void estimateEmissionProb() {
+
+  }
 
 }
