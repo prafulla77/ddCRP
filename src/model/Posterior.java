@@ -120,8 +120,8 @@ public class Posterior {
    * That is, we would like to get the multinomial probability over observations for each table.  This is basically
    * just word counts, plus pseudocounts
    */
-  public statis void estimateEmissionProb() {
+  // public static void estimateEmissionProb() {
 
-  }
+  // }
 
 }
