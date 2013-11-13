@@ -3,6 +3,7 @@ package util;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -51,12 +52,11 @@ public class Util {
 		int count  = 0;
 		for(int table_id=0;table_id<s.getC().get(list_index).size();table_id++)
 		{
-			String customers = s.getCustomers_in_table(table_id, list_index);
-			if(customers != null)
+      HashSet<Integer> customers = s.getCustomersAtTable(table_id, list_index);
+			if(customers != null && customers.size() > 0)
 			{
 				count++;
-				String[] eachCustomers = customers.split(",");
-				out.println("Table "+table_id+" Count "+eachCustomers.length+" :\t"+customers);
+				out.println("Table "+table_id+" Count "+customers.size()+" :\t"+customers);
 				
 			}
 		}

@@ -37,11 +37,10 @@ public class Driver {
       Test t = new TestUniform(100);
       t.generateTestSamples();
 
-
       ArrayList<Double> dirichletParams = new ArrayList<Double>(VOCAB_SIZE);
       for(int i=0;i<VOCAB_SIZE;i++)
-        dirichletParams.add(0.1);
-      HyperParameters h = new HyperParameters(VOCAB_SIZE, dirichletParams, 0.75);
+        dirichletParams.add(0.3);
+      HyperParameters h = new HyperParameters(VOCAB_SIZE, dirichletParams, 0.1);
       Experiment e = new Experiment(t, 1, numIter, h);
       e.runExperiment();
 

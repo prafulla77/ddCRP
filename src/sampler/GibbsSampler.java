@@ -6,6 +6,7 @@ package sampler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -116,7 +117,7 @@ public class GibbsSampler {
 	 * @param list_index
 	 * @param ll
 	 */
-	private static void sampleLink(int index, int list_index, Likelihood ll, HashMap<Integer,Integer> venue_ids)
+	private static void sampleLink(Integer index, int list_index, Likelihood ll, HashMap<Integer,Integer> venue_ids)
 	{
 		LOGGER.log(Level.FINE, "Sampling link for index "+index+" list_index "+list_index);
 		
@@ -125,48 +126,50 @@ public class GibbsSampler {
 		SamplerState s = SamplerStateTracker.samplerStates.get(SamplerStateTracker.current_iter);
 		int table_id = s.get_t(index, list_index); //the table id where the observation is sitting
 		
+		// TO CHANGE /////////////////////////////////
+
 		//get all the customers who are sitting in the table.
-		String customers_in_table = s.getCustomers_in_table(table_id, list_index);
-		String customer_indexes[] = customers_in_table.split(",");
+		HashSet<Integer> customersAtTable = s.getCustomersAtTable(table_id, list_index);
+
+		//String customers_in_table = s.getCustomers_in_table(table_id, list_index);
+		//String customer_indexes[] = customers_in_table.split(",");
 		
 		ArrayList<Integer> orig_table_members = new ArrayList<Integer>(); //this will hold the table members of the customer, if there is a split, we will update it to point to the members of the new table
+		
 		//Create a graph with customers_in_table as the vertices
 		DirectedGraph<Integer, DefaultEdge> g =
 	            new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
-		HashMap<Integer,Integer> map_of_references = new HashMap<Integer,Integer>(); //map to store the reference of the vertices so that they can be used later to form edges.
-		
-		for(int i=0;i<customer_indexes.length;i++)		
+
+		for(Integer i : customersAtTable)	
 		{
-			orig_table_members.add(Integer.parseInt(customer_indexes[i]));
-			if(map_of_references.get(Integer.parseInt(customer_indexes[i]))==null) //didnot encounter this customer b4 
+			orig_table_members.add(i);
+
+			if(!g.containsVertex(i)) //didnot encounter this customer b4 
 			{
-				Integer customer_index = Integer.parseInt(customer_indexes[i]); // creating the reference for the new customer
-				map_of_references.put(customer_index, customer_index); //putting into the map for future reference while creating the edges
-				g.addVertex(customer_index);								
+				g.addVertex(i);								
 			}		
-			//now create an edge with its customer assignment
-			int customer_assignment = s.getC(Integer.parseInt(customer_indexes[i]), list_index);
 			
+			//now create an edge with its customer assignment
+			Integer j = s.getC(i, list_index);
+
 			//lets check we have a vertex already created for this customer or not?
-			if(map_of_references.get(customer_assignment)==null)
+			if(!g.containsVertex(j))
 			{ //nope will have to create a new object
-				//instead of creating the object, lets use the customer_assignment reference itself
-				map_of_references.put(customer_assignment, customer_assignment);
-				g.addVertex(customer_assignment);
+				g.addVertex(j);
 			}
-			else
-			{
-				customer_assignment = map_of_references.get(customer_assignment); //since we have made a reference earlier, we will use that (Is it getting clumsy?)				
-			}
+
 			//adding the edge
-			g.addEdge(map_of_references.get(Integer.parseInt(customer_indexes[i])), customer_assignment);//1st arg, the current customer, 2nd arg, its assignment
+			g.addEdge(i, j);   //1st arg, the current customer, 2nd arg, its assignment
 		} //the graph should be ready
 		
 		//If the 'obs_to_sample' is a part of a cycle then removing its customer assignment cannot split the table. 
 		//Check if there is a cycle containing obs_to_sample
 		CycleDetector<Integer,DefaultEdge> cycleDetector = new CycleDetector<Integer,DefaultEdge>(g);
-		boolean isCyclePresent = cycleDetector.detectCyclesContainingVertex(map_of_references.get(index));
-		if(!isCyclePresent) //on removing the link, the table will be split 
+		boolean isCyclePresent = cycleDetector.detectCyclesContainingVertex(index);
+		// any undirected cycle that is not a directed cycle has to have at least one vertext of out degree 2
+		// since g has out degree of at most 1, any directed cycle is also an undirected cycle
+		// so if there is no directed cycle, upon removing the link the table will be split
+		if(!isCyclePresent) 
 		{
 			LOGGER.log(Level.FINE, index+" doesnot have a cycle and hence the table "+table_id+" will split");
 			
@@ -176,42 +179,38 @@ public class GibbsSampler {
 			UndirectedGraph<Integer,DefaultEdge> u_g =
 					new AsUndirectedGraph<Integer, DefaultEdge>(g); //creating the undirected graph from the directed graph
 			//now removing the edge (obs_to_sample -> its customer assignment)
-			u_g.removeEdge(map_of_references.get(index), map_of_references.get(s.getC(index, list_index)));
+			u_g.removeEdge(index, s.getC(index, list_index));
 			
 			//Lets do a depth first traversal now and get all the table members
-			DepthFirstIterator<Integer,DefaultEdge> iter = new DepthFirstIterator<Integer,DefaultEdge>(u_g,map_of_references.get(index));
+			DepthFirstIterator<Integer,DefaultEdge> iter = new DepthFirstIterator<Integer,DefaultEdge>(u_g,index);
 			ArrayList<Integer> new_table_members = new ArrayList<Integer>();
-			 while(iter.hasNext())			 
-				 new_table_members.add(iter.next());		
-			 orig_table_members = new_table_members; //updating orig_table_members to point to new_table_members
-			 //Let's get the customers which remained in the original table after the split, do a depth first traversal starting from the original customer assignment of the customer to be sampled
-			 iter = new DepthFirstIterator<Integer,DefaultEdge>(u_g,map_of_references.get(s.getC(index, list_index)));
-			 ArrayList<Integer> old_table_members = new ArrayList<Integer>();
-			 while(iter.hasNext())
-				 old_table_members.add(iter.next());
-			 
-			 //Ok, now since the table has split, update the sampler state accordingly
-			 s.setT(s.getT()+1); //incrementing the number of tables
-			 s.setC(null, index, list_index); //since this customer has 'no' customer assignment as of now
-			 int new_table_id = emptyTables.get(list_index).remove(); //getting an empty table
-			 LOGGER.log(Level.FINE, "The new table id after splitting is "+new_table_id);
-			 
-			 for(int l:new_table_members) //setting the table assignment to the new table number			 
-				 s.set_t(new_table_id, l, list_index);
+			while(iter.hasNext())			 
+			  new_table_members.add(iter.next());		
+
+			orig_table_members = new_table_members; //updating orig_table_members to point to new_table_members
+			//Let's get the customers which remained in the original table after the split, do a depth first traversal starting from the original customer assignment of the customer to be sampled
+			iter = new DepthFirstIterator<Integer,DefaultEdge>(u_g, s.getC(index, list_index));
+			ArrayList<Integer> old_table_members = new ArrayList<Integer>();
+			while(iter.hasNext())
+			  old_table_members.add(iter.next());
+
+			//Ok, now since the table has split, update the sampler state accordingly
+			s.setT(s.getT()+1); //incrementing the number of tables
+			s.setC(null, index, list_index); //since this customer has 'no' customer assignment as of now
+			int new_table_id = emptyTables.get(list_index).remove(); //getting an empty table
+			LOGGER.log(Level.FINE, "The new table id after splitting is "+new_table_id);
+
+			for(int l:new_table_members) //setting the table assignment to the new table number			 
+			  s.set_t(new_table_id, l, list_index);
 			int old_table_id = table_id;
-			StringBuffer sb = new StringBuffer();
-			for(int i=0;i<old_table_members.size()-1;i++)			
-				sb.append(old_table_members.get(i)).append(",");
-			sb.append(old_table_members.get(old_table_members.size()-1));
-			s.setCustomers_in_table(sb, old_table_id, list_index);
-			
+
+			s.setCustomersAtTable(new HashSet<Integer>(old_table_members),  old_table_id, list_index);
+
 			table_id = new_table_id; //updating, since this is the new table_id of the current customer we are trying to sample for.
-			sb = new StringBuffer();
-			for(int i=0;i<new_table_members.size()-1;i++)			
-				sb.append(new_table_members.get(i)).append(",");
-			sb.append(new_table_members.get(new_table_members.size()-1));
-			s.setCustomers_in_table(sb, new_table_id, list_index);
+			s.setCustomersAtTable(new HashSet<Integer>(new_table_members),  new_table_id, list_index);
+
 		}
+
 		//Now, will sample a new link for the customer
 		//get the distance matrix for Prior computation
 		ArrayList<CRSMatrix> distanceMatrices = Data.getDistanceMatrices();
@@ -245,13 +244,10 @@ public class GibbsSampler {
 				
 				else //will have to compute the change in likelihood
 				{					
-					//get the proposed table members
-					String s_table_proposed_members = s.getCustomers_in_table(table_proposed, list_index);					
-					String[] table_proposed_members = s_table_proposed_members.split(",");
-					//create an arraylist of the members
-					ArrayList<Integer> proposed_table_members = new ArrayList<Integer>();
-					for(int j=0;j<table_proposed_members.length;j++)
-						proposed_table_members.add(Integer.parseInt(table_proposed_members[j]));					
+
+					HashSet<Integer> proposedTableMembersSet = s.getCustomersAtTable(table_proposed, list_index);
+					ArrayList<Integer> proposed_table_members = new ArrayList<Integer>(proposedTableMembersSet);
+
 					//Now compute the change in likelihood
 					double change_in_log_likelihood = compute_change_in_likelihood(ll,orig_table_members,proposed_table_members,list_index);
 					//System.out.println("Change in LL "+change_in_log_likelihood);
@@ -273,13 +269,16 @@ public class GibbsSampler {
 			for(Integer members:orig_table_members)			
 				s.set_t(assigned_table, members, list_index); //setting the table assignment of the old table members to the new assigned table			
 			//update the map now
+
 			//First, update the new assigned table to include the table members of the customer's table
-			StringBuffer sb_orig_members_in_new_table =new StringBuffer(s.getCustomers_in_table(assigned_table, list_index));
+			HashSet<Integer> hs_orig_members_in_new_table = new HashSet<Integer>(s.getCustomersAtTable(assigned_table, list_index));
 			for(int i=0;i<orig_table_members.size();i++)
-				sb_orig_members_in_new_table.append(",").append(orig_table_members.get(i).toString());
-			s.setCustomers_in_table(sb_orig_members_in_new_table, assigned_table, list_index);
+				hs_orig_members_in_new_table.add(orig_table_members.get(i));
+
+			s.setCustomersAtTable(hs_orig_members_in_new_table, assigned_table, list_index);
 			//Then, update the orig_table to null
-			s.setCustomers_in_table(null,table_id, list_index);
+			s.setCustomersAtTable(null,table_id, list_index);
+
 			//Atlast, enqueue this table_id, since this table is empty
 			emptyTables.get(list_index).add(table_id);
 		}		

@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Random;
 import java.io.PrintStream;
 
-
-
 /**
  * This class will store the estimated posterior from the finished Gibbs samples.
  * @author Justin Cranshaw
@@ -31,11 +29,6 @@ public class Posterior {
    */
   public static ArrayList<SamplerState> states = new ArrayList<SamplerState>();
 
-  /** 
-   * The observations probabilities for each state in states (a multinomical vector)
-   */
-  public static ArrayList<ArrayList<Double>> tableObservationProbs = new ArrayList<ArrayList<Double>>();
-
   /**
    *  The burnin period (number of initial samples to ignore)
    */
@@ -50,6 +43,7 @@ public class Posterior {
    * The normalizing constant (should be numSamples - burnInPeriod, but as a sanity check, keep store it)
    */
   public static int normConstant;
+
 
   /**
    * Estimates the probabilities over states discovered by the sampler

@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 
@@ -59,7 +60,11 @@ public class SamplerStateTracker {
 			ArrayList<ArrayList<Integer>> table_assignments = new ArrayList<ArrayList<Integer>>();
 			ArrayList<ArrayList<Long>> topic_assignments_table = new ArrayList<ArrayList<Long>>();
 			ArrayList<ArrayList<Long>> topic_assignments_customer = new ArrayList<ArrayList<Long>>();
-			ArrayList<HashMap<Integer,StringBuffer>> list_customers_in_table = new  ArrayList<HashMap<Integer,StringBuffer>>();
+			
+			/////
+			// ArrayList<HashMap<Integer,StringBuffer>> list_customers_in_table = new  ArrayList<HashMap<Integer,StringBuffer>>();
+			ArrayList<HashMap<Integer, HashSet<Integer>>> customersAtTableList = new ArrayList<HashMap<Integer, HashSet<Integer>>>();
+
 			HashMap<Long,Long> count_each_topic = new HashMap<Long,Long>();
 			int num_topics = 100; //setting the initial number of topics to 100
 			Random gen = new Random();			
@@ -69,12 +74,22 @@ public class SamplerStateTracker {
 				ArrayList<Integer> table_assignment_per_list = new ArrayList<Integer>();
 				ArrayList<Long> topic_assignments_table_per_list = new ArrayList<Long>();
 				ArrayList<Long> topic_assignments_customer_per_list = new ArrayList<Long>();
-				HashMap<Integer,StringBuffer> customers_in_table_per_list = new HashMap<Integer,StringBuffer>(); 
+				
+				/////
+				// HashMap<Integer,StringBuffer> customers_in_table_per_list = new HashMap<Integer,StringBuffer>(); 
+				HashMap<Integer, HashSet<Integer>> customersAtTable = new HashMap<Integer, HashSet<Integer>>();
+
 				for(int j=0;j<list_observations.get(i).size();j++) //note: the customers are indexed from 0
 				{//initializing the customer assignments for each point to itself and hence each customer in its own table
 					customer_assignment_per_list.add(j); 
 					table_assignment_per_list.add(j);
-					customers_in_table_per_list.put(j, new StringBuffer(Long.toString(j)));
+
+					/////
+					// customers_in_table_per_list.put(j, new StringBuffer(Long.toString(j)));
+				  HashSet<Integer> hs = new HashSet<Integer>();
+				  hs.add(j);
+					customersAtTable.put(j, hs);
+					
 					int topic = gen.nextInt(num_topics);
 					topic_assignments_table_per_list.add(new Long(topic));
 					topic_assignments_customer_per_list.add(new Long(topic));
@@ -84,16 +99,23 @@ public class SamplerStateTracker {
 					else
 						count_each_topic.put(new Long(topic), count+1);
 				}
-				
 				customer_assignments.add(customer_assignment_per_list);
 				table_assignments.add(table_assignment_per_list);
-				list_customers_in_table.add(customers_in_table_per_list);
+
+				/////
+				// list_customers_in_table.add(customers_in_table_per_list);
+				customersAtTableList.add(customersAtTable);
+
 				topic_assignments_table.add(topic_assignments_table_per_list);
 				topic_assignments_customer.add(topic_assignments_customer_per_list);
 			}
 			state0.setC(customer_assignments);
 			state0.set_t(table_assignments);
-			state0.setCustomers_in_table(list_customers_in_table);
+
+			//////
+			// state0.setCustomers_in_table(list_customers_in_table);
+			state0.setCustomersAtTableList(customersAtTableList);
+
 			state0.setK_c(topic_assignments_customer);
 			state0.setK_t(topic_assignments_table);
 			state0.setT(num_data); //number of tables equal to num_data

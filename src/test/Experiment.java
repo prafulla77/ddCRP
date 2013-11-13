@@ -82,8 +82,19 @@ public class Experiment {
       {
         long init_time_iter = System.currentTimeMillis();
         GibbsSampler.doSampling(l, test);
+        System.out.println("----------------------");
         System.out.println("Iteration "+j+" done");
         System.out.println("Took "+(System.currentTimeMillis() - init_time_iter)/(double)1000+" seconds");
+        SamplerState curr = SamplerStateTracker.samplerStates.get(j);
+        if (j > 0) {
+          SamplerState prev = SamplerStateTracker.samplerStates.get(j-1);
+          System.out.println("Table similarity from prev: "+curr.tableJiccardSimilarity(prev));
+        }
+        curr.prettyPrint(System.out);
+        // curr.estimateThetas();
+
+        double ll = l.computeFullLogLikelihood(curr.getCustomersAtTableList());
+        System.out.println("Log Likelihood: " + ll);
       }
       
       //PREDICTION

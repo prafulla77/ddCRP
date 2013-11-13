@@ -5,6 +5,7 @@ package Likelihood;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.commons.math3.special.Gamma;
 
@@ -82,6 +83,21 @@ public class DirichletLikelihood extends Likelihood {
 		}
 		else				
 			return cached_gamma_values.get(arg);		
+	}
+
+	public double computeFullLogLikelihood(ArrayList<HashMap<Integer, HashSet<Integer>>> customersAtTableList) {
+		double ll = 0;
+		for (int listIndex=0; listIndex<customersAtTableList.size(); listIndex++) {
+			HashMap<Integer, HashSet<Integer>> customersAtTable = customersAtTableList.get(listIndex);
+			for (Integer tableId : customersAtTable.keySet()) {
+				if (customersAtTable.get(tableId) != null) {
+					HashSet<Integer> hs = customersAtTable.get(tableId);
+					ArrayList<Integer> tableMembers = new ArrayList<Integer>(hs);
+					ll += computeTableLogLikelihood(tableMembers, listIndex);
+				}
+			}
+		}
+		return ll;
 	}
 
 }
