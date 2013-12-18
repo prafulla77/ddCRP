@@ -263,21 +263,40 @@ public class SamplerState {
 	}
 	
 	/*
-	 * Computes the expected value of the theta vectors for this stampler state, for each city, for each table in the city
+	 * Computes the value of the theta vectors for this stampler state, for each city, for each table in the city
 	 * Each table has a CRSMatrix theta, where
 	 * theta_j = (N_j + a_j) / (n + sum_i(a_i))
 	 * where a_j is the Dirichlet prior parameter
 	 */
 	// public void estimateThetas() {
-	// 	// ArrayList<ArrayList<Double>> listObservations = Data.getObservations();  
-	// 	// private ArrayList<ArrayList<CRSMatrix>> thetas
+	// 	ArrayList<ArrayList<Double>> observations = Data.getObservations();  
+	// 	thetas = new ArrayList<ArrayList<CRSMatrix>>();
 
+	// 	ArrayList<HashMap<Integer, HashSet<Integer>>> customersAtTableList
 	// }
 
 	/**
 	 * Returns for each city, a set of sets of customers sitting at each table
 	 */
-	public ArrayList<HashSet<HashSet<Integer>>> getTableSeatingsSet() {
+
+	public ArrayList<HashSet<HashSet<Integer>>> getTableSeatingsSetNew() 
+	{
+		ArrayList<HashSet<HashSet<Integer>>> tableSeatings = new ArrayList<HashSet<HashSet<Integer>>>();
+		for (int i=0; i<customersAtTableList.size(); i++) {
+			HashMap<Integer, HashSet<Integer>> cityTablesMap = customersAtTableList.get(i);
+			HashSet<HashSet<Integer>> citySeatingsSet = new HashSet<HashSet<Integer>>();
+			for (HashSet<Integer> tableMembers : cityTablesMap.values()) {
+				citySeatingsSet.add(tableMembers);
+			}
+			tableSeatings.add(citySeatingsSet);
+		}
+		System.out.println("table seatings new: ");
+		printTableSeatings(tableSeatings);
+		return tableSeatings;
+	}
+
+	public ArrayList<HashSet<HashSet<Integer>>> getTableSeatingsSet() 
+	{
 		ArrayList<HashSet<HashSet<Integer>>> tableSeatings = new ArrayList<HashSet<HashSet<Integer>>>();
 		for (ArrayList<Integer> cityTables : t) {
 			HashMap<Integer, HashSet<Integer>> tableMembers = new HashMap<Integer, HashSet<Integer>>();
@@ -297,7 +316,25 @@ public class SamplerState {
 			}
 			tableSeatings.add(cityTableSeatings);
 		}
+		System.out.println("table seatings old: ");
+		printTableSeatings(tableSeatings);
 		return tableSeatings;
+	}
+
+	public void printTableSeatings(ArrayList<HashSet<HashSet<Integer>>> ts) {
+		String out = "";
+		for (HashSet<HashSet<Integer>> cityTableSeatings : ts) {
+			for (HashSet<Integer> table : cityTableSeatings) {
+				if (table != null) {
+					for (Integer person : table) {
+						out += person.toString() + ":";
+					}
+					out += " ";
+				}
+			}
+			out += " || ";
+		}
+		// System.out.println(out);
 	}
 
 	/**
@@ -307,6 +344,59 @@ public class SamplerState {
 	public double tableJiccardSimilarity(SamplerState s) {
 		ArrayList<HashSet<HashSet<Integer>>> seatingsA = getTableSeatingsSet();
 		ArrayList<HashSet<HashSet<Integer>>> seatingsB = s.getTableSeatingsSet();
+
+		ArrayList<HashSet<HashSet<Integer>>> seatingsANew = getTableSeatingsSetNew();
+		ArrayList<HashSet<HashSet<Integer>>> seatingsBNew = s.getTableSeatingsSetNew();
+
+		if (!seatingsA.equals(seatingsANew)) {
+			System.out.println("seatingsA are not equal!!!");
+		}
+
+		if (!seatingsB.equals(seatingsBNew)) {
+			System.out.println("seatingsB are not equal!!!");
+		}
+
+		int sizeUnion = 0;
+		int sizeIntersection = 0;
+
+		for (int i=0; i<seatingsA.size(); i++) {
+			HashMap<HashSet<Integer>,Integer> counts = new HashMap<HashSet<Integer>,Integer>();
+			HashSet<HashSet<Integer>> citySeatingsA = seatingsA.get(i);
+			HashSet<HashSet<Integer>> citySeatingsB = seatingsB.get(i);
+			for (HashSet<Integer> t : citySeatingsA) {
+				if (counts.get(t) == null)
+					counts.put(t, 0);
+				counts.put(t, counts.get(t)+1);
+			}
+			for (HashSet<Integer> t : citySeatingsB) {
+				if (counts.get(t) == null)
+					counts.put(t, 0);
+				counts.put(t, counts.get(t)+1);
+			}
+			int citySizeUnion = counts.keySet().size();
+			int citySizeIntersection = 0;
+			// any key in counts that has a value of 2 is in the intersection
+			for (int count : counts.values()) {
+				if (count == 2) {
+					citySizeIntersection += 1;
+				}
+				if (count > 2) {
+					// something is wrong if this happens.
+					System.out.println("More than 2 in the intersection!");
+					System.out.println("  "+count);
+				}
+			}
+			sizeUnion += citySizeUnion;
+			sizeIntersection += citySizeIntersection;
+		}
+
+		return sizeIntersection / (double) sizeUnion;
+	}
+
+	public double tableJiccardSimilarityNew(SamplerState s) {
+		ArrayList<HashSet<HashSet<Integer>>> seatingsA = getTableSeatingsSetNew();
+		ArrayList<HashSet<HashSet<Integer>>> seatingsB = s.getTableSeatingsSetNew();
+
 		int sizeUnion = 0;
 		int sizeIntersection = 0;
 

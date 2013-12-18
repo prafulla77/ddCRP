@@ -30,6 +30,11 @@ public class Posterior {
   public static ArrayList<SamplerState> states = new ArrayList<SamplerState>();
 
   /**
+   *  Emmission Probabilities
+   */ 
+  // public static ArrayList<ArrayList<double>> emitProbabilities = new ArrayList<ArrayList<double>>();
+
+  /**
    *  The burnin period (number of initial samples to ignore)
    */
   public static int burnInPeriod;
@@ -94,6 +99,8 @@ public class Posterior {
 
   // }
   
+
+
   /**
    * Prints the object state
    */
@@ -115,7 +122,15 @@ public class Posterior {
    * just word counts, plus pseudocounts
    */
   // public static void estimateEmissionProb() {
+  //   emitProbabilities = new ArrayList<ArrayList<double>>();
+  //   for (SamplerState s : states) {
+  //     ArrayList<double> emissionProb = estimateEmissionProbForState(s);
+  //     emitProbabilities.add(emissionProb);
+  //   }
+  // }
 
+  // private static ArrayList<double> estimateEmissionProbForState(SamplerState s) {
+  //   ArrayList<double> stateEmitProbs = new ArrayList<double>();  // Should give it a constant size 
   // }
 
 }

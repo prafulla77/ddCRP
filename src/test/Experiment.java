@@ -89,6 +89,7 @@ public class Experiment {
         if (j > 0) {
           SamplerState prev = SamplerStateTracker.samplerStates.get(j-1);
           System.out.println("Table similarity from prev: "+curr.tableJiccardSimilarity(prev));
+          System.out.println("Table similarity from prev new: "+curr.tableJiccardSimilarityNew(prev));
         }
         curr.prettyPrint(System.out);
         // curr.estimateThetas();
