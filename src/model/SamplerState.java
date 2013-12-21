@@ -286,7 +286,8 @@ public class SamplerState {
 			HashMap<Integer, HashSet<Integer>> cityTablesMap = customersAtTableList.get(i);
 			HashSet<HashSet<Integer>> citySeatingsSet = new HashSet<HashSet<Integer>>();
 			for (HashSet<Integer> tableMembers : cityTablesMap.values()) {
-				citySeatingsSet.add(tableMembers);
+				if (tableMembers!=null)
+					citySeatingsSet.add(tableMembers);
 			}
 			tableSeatings.add(citySeatingsSet);
 		}
