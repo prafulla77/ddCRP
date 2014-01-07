@@ -2,6 +2,8 @@ package util;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -50,16 +52,68 @@ public class Util {
 		int count  = 0;
 		for(int table_id=0;table_id<s.getC().get(list_index).size();table_id++)
 		{
-			String customers = s.getCustomers_in_table(table_id, list_index);
-			if(customers != null)
+      HashSet<Integer> customers = s.getCustomersAtTable(table_id, list_index);
+			if(customers != null && customers.size() > 0)
 			{
 				count++;
-				String[] eachCustomers = customers.split(",");
-				out.println("Table "+table_id+" Count "+eachCustomers.length+" :\t"+customers);
+				out.println("Table "+table_id+" Count "+customers.size()+" :\t"+customers);
 				
 			}
 		}
 		out.println("There are "+count+" occupied tables");
+	}
+
+
+
+	public static void testSamplerStateEquals() {
+	  SamplerState s1 = SamplerStateTracker.returnCurrentSamplerState();
+    SamplerState s2 = s1.copy();
+
+    // Make a different state
+    SamplerState s3 = s1.copy();
+    ArrayList<ArrayList<Integer>> c = s3.getC();
+    ArrayList<Integer> c1 = c.get(1);
+    c1.set(1, 999999);
+    c.set(1, c1);
+    s3.setC(c);
+
+    HashMap<SamplerState, Integer> countsMap = new HashMap<SamplerState, Integer>();  
+    if (countsMap.get(s1) == null) {
+      System.out.println("  Get s1 returns null as expected");
+    } else {
+      System.out.println("  Get s1 didn't return null");
+    }
+
+    countsMap.put(s1, 0);
+    Integer n = countsMap.get(s2);
+    if (n == null) {
+      System.out.println("  n is unexpectedly null");
+    } else {
+      System.out.println("  n is not null as expected.  value: " + String.valueOf(n));
+      countsMap.put(s1,n+1);
+      System.out.println("  updated value: " + String.valueOf(countsMap.get(s2)));
+    }
+
+    if (countsMap.get(s2) == null) {
+      System.out.println("  Get s2 returned null.  this is a problem.");
+    } else {
+      System.out.println("  Get s2 didn't return null, as expected.");
+    }
+
+    if (countsMap.get(s3) == null) {
+      System.out.println("  Get s3 returns null as expected");
+    } else {
+      System.out.println("  Get s3 didn't return null");
+    }
+
+    System.out.println("Does s1 equal s2?");
+    System.out.println(s1.equals(s2));
+    System.out.println("Does s2 equal s3?");
+    System.out.println(s2.equals(s3));
+    System.out.println("hashCode()");
+    System.out.println(String.valueOf(s1.hashCode()));
+    System.out.println(String.valueOf(s2.hashCode()));
+    System.out.println(String.valueOf(s3.hashCode()));
 	}
 
 
