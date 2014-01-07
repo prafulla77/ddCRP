@@ -5,6 +5,7 @@ package Likelihood;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.commons.math3.special.Gamma;
 
@@ -17,10 +18,14 @@ import data.Data;
  * @author rajarshd
  *
  */
-public class DirichletLikelihood implements Likelihood {
+public class DirichletLikelihood extends Likelihood {
 
 	private static HashMap<Double,Double> cached_gamma_values = new HashMap<Double,Double>();
 	
+	public DirichletLikelihood(HyperParameters h) {
+		hyperParameters = h;
+	}
+
 	@Override
 	public double computeTableLogLikelihood(ArrayList<Integer> table_members,
 			int list_index) {
@@ -40,7 +45,7 @@ public class DirichletLikelihood implements Likelihood {
 		}
 		
 		//get the dirichlet hyper-parameter
-		ArrayList<Double> dirichletParams = HyperParameters.dirichletParam;
+		ArrayList<Double> dirichletParams = hyperParameters.getDirichletParam();
 		double  sum_venue_cat_alpha=0, sum_log_gamma_sum_venue_cat_alpha = 0,sum_alpha =0,sum_log_gamma_alpha=0 ;
 		
 		for(int i=0;i<dirichletParams.size();i++) //loop for each possible venue category
@@ -78,6 +83,21 @@ public class DirichletLikelihood implements Likelihood {
 		}
 		else				
 			return cached_gamma_values.get(arg);		
+	}
+
+	public double computeFullLogLikelihood(ArrayList<HashMap<Integer, HashSet<Integer>>> customersAtTableList) {
+		double ll = 0;
+		for (int listIndex=0; listIndex<customersAtTableList.size(); listIndex++) {
+			HashMap<Integer, HashSet<Integer>> customersAtTable = customersAtTableList.get(listIndex);
+			for (Integer tableId : customersAtTable.keySet()) {
+				if (customersAtTable.get(tableId) != null) {
+					HashSet<Integer> hs = customersAtTable.get(tableId);
+					ArrayList<Integer> tableMembers = new ArrayList<Integer>(hs);
+					ll += computeTableLogLikelihood(tableMembers, listIndex);
+				}
+			}
+		}
+		return ll;
 	}
 
 }
