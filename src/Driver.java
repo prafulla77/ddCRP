@@ -33,9 +33,9 @@ public class Driver {
 			//set the hyper-parameters
 			ArrayList<Double> dirichlet_params = new ArrayList<Double>(vocab_size);
 			for(int i=0;i<vocab_size;i++)
-				dirichlet_params.add(0.1);
+				dirichlet_params.add(0.3);
 			HyperParameters.dirichletParam = dirichlet_params;
-			HyperParameters.ddcrp_prior = 0.75;
+			HyperParameters.ddcrp_prior = 0.1;
 //			
 			ArrayList<ArrayList<Double>> list_observations = Data.getObservations();	
 			SamplerStateTracker.initializeSamplerState(list_observations);
