@@ -13,7 +13,7 @@ import data.Data;
 
 public class Driver {
 	
-	public static int vocab_size = 419; //TO-DO, will take this as a command line param
+	public static int vocab_size;
 
 	/**
 	 * @param args
@@ -22,30 +22,29 @@ public class Driver {
 	public static void main(String[] args) throws FileNotFoundException {
 		// TODO Auto-generated method stub
 		try {
-			//setup logging
-//			Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-//			logger.setLevel(Level.FINE);
-//			FileHandler logFileHandler = new FileHandler("log.txt");
-//			logFileHandler.setFormatter(new SimpleFormatter());
-//			logger.addHandler(logFileHandler);
-		
-			long init_time = System.currentTimeMillis();
+			
+			vocab_size = Integer.parseInt(args[1]);
+			System.out.println("Vocab Size is "+vocab_size);
+			
 			//set the hyper-parameters
-			ArrayList<Double> dirichlet_params = new ArrayList<Double>(vocab_size);
+			double dirichlet_param = Double.parseDouble(args[2]);
+			System.out.println("Dirichlet parameter is "+dirichlet_param);
+			ArrayList<Double> dirichlet = new ArrayList<Double>();
 			for(int i=0;i<vocab_size;i++)
-				dirichlet_params.add(0.3);
-			HyperParameters.dirichletParam = dirichlet_params;
-			HyperParameters.ddcrp_prior = 0.1;
-//			
+				dirichlet.add(dirichlet_param);
+			double alpha = Double.parseDouble(args[3]);
+			System.out.println("Self Linkage Prob is "+alpha);
+			HyperParameters h = new HyperParameters(vocab_size, dirichlet, alpha);
+			
 			ArrayList<ArrayList<Double>> list_observations = Data.getObservations();	
 			SamplerStateTracker.initializeSamplerState(list_observations);
-			//SamplerStateTracker.samplerStates.get(0).prettyPrint(System.out);
-			Likelihood l = new DirichletLikelihood();
+			Likelihood l = new DirichletLikelihood(h);
 			
 			//do sampling		
-			SamplerStateTracker.max_iter = Integer.parseInt(args[1]);
+			SamplerStateTracker.max_iter = Integer.parseInt(args[0]);
 			System.out.println("Gibbs Sampler will run for "+SamplerStateTracker.max_iter+" iterations.");
-			for(int i=0;i<SamplerStateTracker.max_iter;i++)
+			long init_time = System.currentTimeMillis();
+			for(int i=1;i<=SamplerStateTracker.max_iter;i++)
 			{
 				long init_time_iter = System.currentTimeMillis();
 				GibbsSampler.doSampling(l);
@@ -58,15 +57,6 @@ public class Driver {
 			for(int i=0;i<list_observations.size();i++)
 				Util.printTableConfiguration(i, new PrintStream("tables/table_configuration"+i+".txt"));
 			
-//			
-//			DirichletLikelihood l = new DirichletLikelihood();
-//			ArrayList<Integer> t = new ArrayList<Integer>();
-//			t.add(1);
-//			t.add(2);
-//			t.add(3);
-//			
-//			System.out.println(l.computeTableLogLikelihood(t, 0));
-//		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

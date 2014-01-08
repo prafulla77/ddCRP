@@ -34,6 +34,7 @@ public class Data {
 		{
 			list_observations = new ArrayList<ArrayList<Double>>();
 			//read the corpus file
+			int num_obs = 0;
 			BufferedReader reader = new BufferedReader(new FileReader(corpusFile));
 			String line;
 			// while((line = reader.readLine())!=null) //each line represents the observations a city or a document etc....
@@ -47,9 +48,11 @@ public class Data {
 					Double d = Double.parseDouble(observations[i]);
 					list.add(d);				
 				}
-				list_observations.add(list);				
+				list_observations.add(list);
+				num_obs = num_obs + observations.length;
 			}			
 			reader.close();			
+			System.out.println("Number of data points are "+num_obs);
 		}catch(FileNotFoundException ex){
 			ex.printStackTrace();
 		}catch(IOException ex){
