@@ -29,6 +29,11 @@ public class Posterior {
    */
   public static ArrayList<SamplerState> states = new ArrayList<SamplerState>();
 
+ /**
+   *  The possible states. 
+   */
+  public static ArrayList<ArrayList<HashMap<Integer, CRSMatrix>>> thetas
+
   /**
    *  Emmission Probabilities
    */ 

@@ -10,6 +10,7 @@ import model.HyperParameters;
 import model.SamplerState;
 import model.SamplerStateTracker;
 import model.Posterior;
+import model.Theta;
 import sampler.GibbsSampler;
 import test.Test;
 import test.TestSample;
@@ -46,8 +47,7 @@ public class Experiment {
   private ArrayList<ArrayList<ArrayList<TestPrediction>>> experimentResults = new ArrayList<ArrayList<ArrayList<TestPrediction>>>();
 
 
-  public Experiment
-  (Test t, int numE, int numI, HyperParameters h)
+  public Experiment (Test t, int numE, int numI, HyperParameters h)
   {
     test = t;
     numExperiments = numE;
@@ -88,11 +88,15 @@ public class Experiment {
         SamplerState curr = SamplerStateTracker.samplerStates.get(j);
         if (j > 0) {
           SamplerState prev = SamplerStateTracker.samplerStates.get(j-1);
-          System.out.println("Table similarity from prev: "+curr.tableJiccardSimilarity(prev));
-          System.out.println("Table similarity from prev new: "+curr.tableJiccardSimilarityNew(prev));
         }
         curr.prettyPrint(System.out);
-        // curr.estimateThetas();
+
+        // Estimate thetas for the current sampler state;
+        Theta thetas = new Theta();
+        thetas.setSamplerState(curr);
+        thetas.setHyperParameters(hyperParameters);
+        thetas.estimateThetas(test);
+        thetas.prettyPrint();
 
         double ll = l.computeFullLogLikelihood(curr.getCustomersAtTableList());
         System.out.println("Log Likelihood: " + ll);
@@ -114,7 +118,6 @@ public class Experiment {
       experimentResults.add(testPredictions);
 
       Posterior.estimatePosterior(0);
-      Posterior.prettyPrint(System.out);
 
       // outputResultsToCsv();
     }

@@ -19,7 +19,7 @@ public class SamplerState {
 	 * The number of data instances.
 	 */
 	private static Long num_data;
-	
+
 	/**
 	 * This stores the customer link for each data point. Each list represents a city/document etc.
 	 */
@@ -59,12 +59,6 @@ public class SamplerState {
 	 * ArrayList is over documents (cities), hashmap keys are table ids, hasmap values are a hashset of customer ids
 	 */
 	private ArrayList<HashMap<Integer,HashSet<Integer>>> customersAtTableList;
-
-  /** 
-   * The multinomial parameter seen for each city, for each table in the city.  each theta is a CRSMatrix
-   */
-  private ArrayList<ArrayList<CRSMatrix>> thetas = new ArrayList<ArrayList<CRSMatrix>>();
-
 
 
 	/**
@@ -262,24 +256,12 @@ public class SamplerState {
 		out.println("Total number of topics "+K);
 	}
 	
-	/*
-	 * Computes the value of the theta vectors for this stampler state, for each city, for each table in the city
-	 * Each table has a CRSMatrix theta, where
-	 * theta_j = (N_j + a_j) / (n + sum_i(a_i))
-	 * where a_j is the Dirichlet prior parameter
-	 */
-	// public void estimateThetas() {
-	// 	ArrayList<ArrayList<Double>> observations = Data.getObservations();  
-	// 	thetas = new ArrayList<ArrayList<CRSMatrix>>();
-
-	// 	ArrayList<HashMap<Integer, HashSet<Integer>>> customersAtTableList
-	// }
 
 	/**
 	 * Returns for each city, a set of sets of customers sitting at each table
 	 */
 
-	public ArrayList<HashSet<HashSet<Integer>>> getTableSeatingsSetNew() 
+	public ArrayList<HashSet<HashSet<Integer>>> getTableSeatingsSet() 
 	{
 		ArrayList<HashSet<HashSet<Integer>>> tableSeatings = new ArrayList<HashSet<HashSet<Integer>>>();
 		for (int i=0; i<customersAtTableList.size(); i++) {
@@ -291,12 +273,10 @@ public class SamplerState {
 			}
 			tableSeatings.add(citySeatingsSet);
 		}
-		System.out.println("table seatings new: ");
-		printTableSeatings(tableSeatings);
 		return tableSeatings;
 	}
 
-	public ArrayList<HashSet<HashSet<Integer>>> getTableSeatingsSet() 
+	public ArrayList<HashSet<HashSet<Integer>>> getTableSeatingsSetOld() 
 	{
 		ArrayList<HashSet<HashSet<Integer>>> tableSeatings = new ArrayList<HashSet<HashSet<Integer>>>();
 		for (ArrayList<Integer> cityTables : t) {
@@ -317,8 +297,6 @@ public class SamplerState {
 			}
 			tableSeatings.add(cityTableSeatings);
 		}
-		System.out.println("table seatings old: ");
-		printTableSeatings(tableSeatings);
 		return tableSeatings;
 	}
 
@@ -345,17 +323,6 @@ public class SamplerState {
 	public double tableJiccardSimilarity(SamplerState s) {
 		ArrayList<HashSet<HashSet<Integer>>> seatingsA = getTableSeatingsSet();
 		ArrayList<HashSet<HashSet<Integer>>> seatingsB = s.getTableSeatingsSet();
-
-		ArrayList<HashSet<HashSet<Integer>>> seatingsANew = getTableSeatingsSetNew();
-		ArrayList<HashSet<HashSet<Integer>>> seatingsBNew = s.getTableSeatingsSetNew();
-
-		if (!seatingsA.equals(seatingsANew)) {
-			System.out.println("seatingsA are not equal!!!");
-		}
-
-		if (!seatingsB.equals(seatingsBNew)) {
-			System.out.println("seatingsB are not equal!!!");
-		}
 
 		int sizeUnion = 0;
 		int sizeIntersection = 0;
@@ -394,9 +361,9 @@ public class SamplerState {
 		return sizeIntersection / (double) sizeUnion;
 	}
 
-	public double tableJiccardSimilarityNew(SamplerState s) {
-		ArrayList<HashSet<HashSet<Integer>>> seatingsA = getTableSeatingsSetNew();
-		ArrayList<HashSet<HashSet<Integer>>> seatingsB = s.getTableSeatingsSetNew();
+	public double tableJiccardSimilarityOld(SamplerState s) {
+		ArrayList<HashSet<HashSet<Integer>>> seatingsA = getTableSeatingsSetOld();
+		ArrayList<HashSet<HashSet<Integer>>> seatingsB = s.getTableSeatingsSetOld();
 
 		int sizeUnion = 0;
 		int sizeIntersection = 0;
